@@ -1,0 +1,12 @@
+import { Module } from '@nestjs/common';
+import { CartasPerService } from './cartas-per.service';
+import { CartasPerController } from './cartas-per.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { CartasPer } from './entities/cartas-per.entity';
+
+@Module({
+  imports: [TypeOrmModule.forFeature([CartasPer])],
+  controllers: [CartasPerController],
+  providers: [CartasPerService],
+})
+export class CartasPerModule {}
