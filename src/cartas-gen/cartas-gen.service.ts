@@ -46,33 +46,15 @@ export class CartasGenService {
     private dockGeneratorService: DockGeneratorService,
     private alumnoService: AlumnoService,
     private usuarioService: UsuariosService) { }
-
-
   async createById(rut: number, createCartasGenDto: CreateCartasGenDto) {
-    /*
-    TODO: Implementar la creación de cartas genéricas por rut
-    -> Se debe buscar el estudiante por su rut
-    -> Se debe buscar la última carta genérica creada para el estudiante, si no existe crear de una con los datos del estudiante enseguida
-    -> Guardar en la base de datos los datos de la carta genérica, sumar uno al count_cg. Si esta ya existía desde antes solo cambiar fecha de actualización y count_cg
-    -> Generar documento dependiendo de lo que sucedió (docx)
-    -> Envío de correo con la carta generada
-    */
-
-    //OBTENER ID EN BASE A RUT  
     const alumno = await this.alumnoService.obtainIdByRut(rut);
-    //OBTENER ULTIMA CARTA GENÉRICA
     const lastCartaGen = await this.CartasGenRepository.createQueryBuilder('carta')
       .innerJoinAndSelect('carta.estudiante', 'alumno')
       .where('carta.estudiante_id = :id', { id: alumno.id })
       .getMany();
     if (lastCartaGen.length > 0) {
-      //Caso en el que existe una carta generada anteriormente
-
-      //En este caso sumar 1 al count_cg y actualizar fecha de actualización
       const count_cg = lastCartaGen[0].cantidadGenerada + 1;
       const fecha_actualizacion = new Date();
-      //Sobreescribir documento nuevo 
-      //TODO
       const extracto_1 = "";
       const extracto_2 = "";
       const extracto_3 = "";
@@ -98,21 +80,22 @@ export class CartasGenService {
         const extracto4 = "EL/LA ALUMNO/A";
       }
       */
-
       const correos = await this.usuarioService.findAllSede(alumno.sede);
       const correosStr = correos.map(usuario => usuario.correo).join(', ');
+      const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+      const mesNombre = meses[new Date().getMonth()];
       this.dockGeneratorService.crear_cg({
         nombre_archivo: lastCartaGen[0].nombreArchivo,
         sede: alumno.sede,
         dia: new Date().getDate(),
-        mes: new Date().getMonth(),
+        mes: mesNombre,
         anio: new Date().getFullYear(),
         extracto1: extracto_1,
         primer_nombre: alumno.primerNombre,
         segundo_nombre: alumno.segundoNombre,
         apellido_paterno: alumno.apellidoPaterno,
         apellido_materno: alumno.apellidoMaterno,
-        run: alumno.run,
+        rut: alumno.run + "-" + alumno.df,
         extracto2: extracto_2,
         extracto3: extracto_3,
         ultimo_sem_aprobado: alumno.ultimoSemAprobado,
@@ -123,14 +106,8 @@ export class CartasGenService {
         extracto4: extracto_4,
         piepagina: "Pie de página"
       });
-
-      //Guardar en database la actualización y actualizar enteramente la carta generada
       this.CartasGenRepository.update(lastCartaGen[0].id, { cantidadGenerada: count_cg, fechaActualizacion: fecha_actualizacion, revisado: false });
-      //Enviar correo con archivo adjunto
-
-      //Enviar correo al alumno con la carta generada
       const filepath = path.join(__dirname, "..", "..", "public", "documentos", lastCartaGen[0].nombreArchivo);
-      console.log(filepath)
       await this.mailerService.sendMail(
         alumno.correoInstitucional, //to
         'Actualización Carta Generica', //Subject
@@ -140,19 +117,12 @@ export class CartasGenService {
         lastCartaGen[0].nombreArchivo, //Nombre del archivo
         filepath //Path del archivo
       );
-
-
+      return 'Carta Actualizada';
     } else {
-      //Caso en el que la carta fue generada por primera vez
-      
-      //En este caso crear una carta genérica con los datos del estudiante
-      //TODO
       const extracto_1 = "";
       const extracto_2 = "";
       const extracto_3 = "";
       const extracto_4 = "";
-
-
       if (alumno.sexo == "femenino") {
         const extracto_1 = "nuestra alumna Señorita";
         const extracto2 = "alumna";
@@ -161,22 +131,25 @@ export class CartasGenService {
       }
       else if (alumno.sexo == "masculino") {
         let extracto_1 = "nuestro alumno Señor";
-        const extracto2 = "alumno";
-        const extracto3 = "El señor";
-        const extracto4 = "EL ALUMNO";
+        const extracto_2 = "alumno";
+        const extracto_3 = "El señor";
+        const extracto_4 = "EL ALUMNO";
       }
+
+      const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+      const mesNombre = meses[new Date().getMonth()];
       this.dockGeneratorService.crear_cg({
         nombre_archivo: alumno.run + '-carta_generica.docx',
         sede: alumno.sede,
         dia: new Date().getDate(),
-        mes: new Date().getMonth(),
+        mes: mesNombre,
         anio: new Date().getFullYear(),
         extracto1: extracto_1,
         primer_nombre: alumno.primerNombre,
         segundo_nombre: alumno.segundoNombre,
         apellido_paterno: alumno.apellidoPaterno,
         apellido_materno: alumno.apellidoMaterno,
-        run: alumno.run,
+        run: alumno.run + "-" + alumno.df,
         extracto2: extracto_2,
         extracto3: extracto_3,
         ultimo_sem_aprobado: alumno.ultimoSemAprobado,
@@ -187,8 +160,6 @@ export class CartasGenService {
         extracto4: extracto_4,
         piepagina: "Pie de página"
       });
-
-      //Guardar en database la carta generada
       const newCarta = this.CartasGenRepository.create({
         estudianteId: alumno.id,
         cantidadGenerada: 1,
@@ -198,13 +169,20 @@ export class CartasGenService {
         fechaActualizacion: new Date()
       });
       await this.CartasGenRepository.save(newCarta);
-      //Enviar correo con archivo adjunto 
-      //TODO
-
-
+      const correos = await this.usuarioService.findAllSede(alumno.sede);
+      const correosStr = correos.map(usuario => usuario.correo).join(', ');
+      const filepath = path.join(__dirname, "..", "..", "public", "documentos", alumno.run + '-carta_generica.docx');
+      await this.mailerService.sendMail(
+        alumno.correoInstitucional, //to
+        'Actualización Carta Generica', //Subject
+        'Usted ha generado una nueva carta generica, adjunta a este correo se encuentra el archivo correspondiente.', //Text
+        '', //HTML
+        correosStr, //CC
+        lastCartaGen[0].nombreArchivo, //Nombre del archivo
+        filepath //Path del archivo
+      );
+      return 'Carta creada';
     }
-
-    return 'Carta creada o actualizada';
   }
 
 
