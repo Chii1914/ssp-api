@@ -31,16 +31,27 @@ export class CartasPerService {
     return 'This action adds a new cartasPer';
   }
 
-  async createById(rut: number, createCartasPerDto: CreateCartasPerDto) {
+  async createById(nombreSupervisor: string, organismo: string, nombreOrganismo: string, sexoSupervisor: string, divisionDepartamento: string, seccionUnidad: string, rut: number, createCartasPerDto: CreateCartasPerDto) {
 
     //Aquí entran datos como 
     /*
     Organismo
-    Nombre Organismo
+    Nombre Supervisor
+    Cargo Supervisor
     Sexo del supervisor (H, M o NA)
     División/Departamento
     Sección/Unidad
     */
+    let extracto1_supervisor = "";
+    let extracto2_supervisor = "";
+    if (sexoSupervisor == "Masculino") {
+      extracto1_supervisor = "Señor";
+      extracto2_supervisor = "Estimado Señor";
+    } else if (sexoSupervisor == "Femenino") {
+      extracto1_supervisor = "Señora";
+      extracto2_supervisor = "Estimada Señora";
+    }
+
     const alumno = await this.alumnoService.obtainIdByRut(rut);
     const lastCartaPer = await this.CartasPerRepository.createQueryBuilder('carta')
       .innerJoinAndSelect('carta.estudiante', 'alumno')
@@ -73,23 +84,29 @@ export class CartasPerService {
       let piepagina = "";
       if (alumno.sede == "Valparaíso") {
         piepagina = "Las Heras Nº 06 Valparaíso | Fono: (32) 250 7961- 2507815 | E-mail: practivasv@uv.cl, www.uv.cl";
-      }else if (alumno.sede == "Santiago") {
+      } else if (alumno.sede == "Santiago") {
         piepagina = "Campus Santiago - Gran Avenida 4160, San Miguel | Fono +56 (2)2329  2149";
       }
-      this.dockGeneratorService.crear_cg({
+      this.dockGeneratorService.crear_cp({
         nombre_archivo: lastCartaPer[0].nombreArchivo,
         sede: alumno.sede,
         dia: new Date().getDate(),
         mes: mesNombre,
         anio: new Date().getFullYear(),
-        extracto1_supervisor: extracto_1,
+        extracto1_supervisor: extracto1_supervisor,
+        nombre_supervisor: nombreSupervisor,
+        division_departamento: divisionDepartamento,
+        seccion_unidad: seccionUnidad,
+        extracto2_supervisor: extracto2_supervisor,
+        extracto1_alumno: extracto_1,
         primer_nombre: alumno.primerNombre,
         segundo_nombre: alumno.segundoNombre,
         apellido_paterno: alumno.apellidoPaterno,
         apellido_materno: alumno.apellidoMaterno,
-        rut: alumno.run + "-" + alumno.df.toUpperCase(),
-        extracto2: extracto_2,
-        extracto3: extracto_3,
+        run: alumno.run,
+        df: alumno.df,
+        extracto2_alumno: extracto_2,
+        extracto3_alumno: extracto_3,
         ultimo_sem_aprobado: alumno.ultimoSemAprobado,
         nombre_firmante: firmas[0].nombreFirmante,
         cargo_firmante: firmas[0].cargo,

@@ -47,13 +47,14 @@ export class DockGeneratorService {
 
     crear_cp(data: Object) { 
         const pathTemplate = path.join(__dirname, "..", "..", "public", "plantillas", "carta_personalizada_plantilla.docx");
-        const outputPath = path.join(__dirname, "..", "..", "public", "documentos");
+        const outputPath = path.join(__dirname, "..", "..", "public", "documentos", data['run'].toString()); //CREAR CARPETA CON EL RUT DEL ALUMNO RECURSIVAMENTE
         const content = fs.readFileSync(path.resolve(pathTemplate), 'binary'); //De donde se lee la template 
         const zip = new PizZip(content);
         const doc = new Docxtemplater(zip, {
             paragraphLoop: true,
             linebreaks: true,
         });
+        console.log(data)
         doc.render({
             sede: data['sede'],
             dia:  data['dia'],

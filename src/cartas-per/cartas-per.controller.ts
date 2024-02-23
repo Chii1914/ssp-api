@@ -9,8 +9,19 @@ export class CartasPerController {
 
   @Post(':rut')
   createByRut(@Param('rut') rut: number, @Body() createCartasGenDto: CreateCartasPerDto) {
-    return this.cartasPerService.createById(rut, createCartasGenDto);
+    const {nombreSupervisor, organismo, nombreOrganismo, sexoSupervisor, divisionDepartamento, seccionUnidad } = createCartasGenDto;
+    return this.cartasPerService.createById(
+      nombreSupervisor,
+      organismo,
+      nombreOrganismo,
+      sexoSupervisor,
+      divisionDepartamento,
+      seccionUnidad,
+      rut,
+      createCartasGenDto
+    );
   }
+
 
   @Post()
   create(@Body() createCartasPerDto: CreateCartasPerDto) {
