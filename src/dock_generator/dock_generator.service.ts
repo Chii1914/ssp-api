@@ -8,7 +8,7 @@ import * as path from 'path';
 @Injectable()
 export class DockGeneratorService {
 
-    crear_cg(data: Object) {
+   crear_cg(data: Object) {
         const pathTemplate = path.join(__dirname, "..", "..", "public", "plantillas", "carta_generica_plantilla.docx");
         const outputPath = path.join(__dirname, "..", "..", "public", "documentos");
         const content = fs.readFileSync(path.resolve(pathTemplate), 'binary'); //De donde se lee la template 
@@ -18,7 +18,6 @@ export class DockGeneratorService {
             linebreaks: true,
         });
         doc.render({
-            
             sede: data['sede'],
             dia:  data['dia'],
             mes: data['mes'],
@@ -38,10 +37,9 @@ export class DockGeneratorService {
             firma_sec: data['firma_sec'],
             extracto4: data['extracto4'],
             piepagina: data['piepagina'],
-
         });
         const buf = doc.getZip().generate({
-            type: "nodebuffer",
+            type: "nodebuffer", 
             compression: "DEFLATE",
         });
         fs.writeFileSync(path.resolve(path.resolve(outputPath), data['nombre_archivo']), buf);

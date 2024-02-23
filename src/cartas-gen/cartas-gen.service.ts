@@ -11,29 +11,7 @@ import { DockGeneratorService } from 'src/dock_generator/dock_generator.service'
 import * as path from 'path';
 import { Usuario } from 'src/usuarios/entities/usuario.entity';
 import { UsuariosService } from '../usuarios/usuarios.service';
-
-/*
-nombre_archivo: data['nombre_archivo'],
-            sede: data['sede'],
-            dia:  data['dia'],
-            mes: data['mes'],
-            anio: data['anio'],
-            extracto1: data['extracto1'],
-            primer_nombre: data['primer_nombre'],
-            segundo_nombre: data['segundo_nombre'],
-            apellido_paterno: data['apellido_paterno'],
-            apellido_materno: data['apellido_materno'],
-            run: data['rut'],
-            extracto2: data['extracto2'],
-            extracto3: data['extracto3'],
-            ultimo_sem_aprobado: data['ultimo_sem_aprobado'],
-            nombre_firmante: data['nombre_firmante'],
-            cargo_firmante: data['cargo_firmante'],
-            firma_firmante: data['firma_firmante'],
-            firma_sec: data['firma_sec'],
-            extracto4: data['extracto4'],
-            piepagina: data['piepagina'],
- */
+import { FirmasService } from '../firmas/firmas.service';
 
 @Injectable()
 export class CartasGenService {
@@ -45,7 +23,8 @@ export class CartasGenService {
     private mailerService: MailerService,
     private dockGeneratorService: DockGeneratorService,
     private alumnoService: AlumnoService,
-    private usuarioService: UsuariosService) { }
+    private usuarioService: UsuariosService,
+    private firmasService: FirmasService) { }
   async createById(rut: number, createCartasGenDto: CreateCartasGenDto) {
     const alumno = await this.alumnoService.obtainIdByRut(rut);
     const lastCartaGen = await this.CartasGenRepository.createQueryBuilder('carta')
@@ -55,21 +34,21 @@ export class CartasGenService {
     if (lastCartaGen.length > 0) {
       const count_cg = lastCartaGen[0].cantidadGenerada + 1;
       const fecha_actualizacion = new Date();
-      const extracto_1 = "";
-      const extracto_2 = "";
-      const extracto_3 = "";
-      const extracto_4 = "";
+      let extracto_1 = "";
+      let extracto_2 = "";
+      let extracto_3 = "";
+      let extracto_4 = "";
       if (alumno.sexo == "femenino") {
-        const extracto_1 = "nuestra alumna Señorita";
-        const extracto2 = "alumna";
-        const extracto3 = "La señorita";
-        const extracto4 = "LA ALUMNA";
+        extracto_1 = "nuestra alumna Señorita";
+        extracto_2 = "alumna";
+        extracto_3 = "La señorita";
+        extracto_4 = "LA ALUMNA";
       }
       else if (alumno.sexo == "masculino") {
-        let extracto_1 = "nuestro alumno Señor";
-        const extracto2 = "alumno";
-        const extracto3 = "El señor";
-        const extracto4 = "EL ALUMNO";
+        extracto_1 = "nuestro alumno Señor";
+        extracto_2 = "alumno";
+        extracto_3 = "El señor";
+        extracto_4 = "EL ALUMNO";
       }
       //Para después modificando la bd
       /*
@@ -84,6 +63,13 @@ export class CartasGenService {
       const correosStr = correos.map(usuario => usuario.correo).join(', ');
       const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
       const mesNombre = meses[new Date().getMonth()];
+      const firmas = await this.firmasService.findBySede(alumno.sede);
+      let piepagina = "";
+      if (alumno.sede == "Valparaíso") {
+        piepagina = "Las Heras Nº 06 Valparaíso | Fono: (32) 250 7961- 2507815 | E-mail: practivasv@uv.cl, www.uv.cl";
+      } else if (alumno.sede == "Santiago") {
+        piepagina = "Campus Santiago - Gran Avenida 4160, San Miguel | Fono +56 (2)2329  2149";
+      }
       this.dockGeneratorService.crear_cg({
         nombre_archivo: lastCartaGen[0].nombreArchivo,
         sede: alumno.sede,
@@ -95,16 +81,16 @@ export class CartasGenService {
         segundo_nombre: alumno.segundoNombre,
         apellido_paterno: alumno.apellidoPaterno,
         apellido_materno: alumno.apellidoMaterno,
-        rut: alumno.run + "-" + alumno.df,
+        rut: alumno.run + "-" + alumno.df.toUpperCase(),
         extracto2: extracto_2,
         extracto3: extracto_3,
         ultimo_sem_aprobado: alumno.ultimoSemAprobado,
-        nombre_firmante: "Nombre Firmante",
-        cargo_firmante: "Cargo Firmante",
-        firma_firmante: "Firma Firmante",
-        firma_sec: "Firma Secretaria",
+        nombre_firmante: firmas[0].nombreFirmante,
+        cargo_firmante: firmas[0].cargo,
+        firma_firmante: firmas[0].vocativo,
+        firma_sec: firmas[0].firmaSec,
         extracto4: extracto_4,
-        piepagina: "Pie de página"
+        piepagina: piepagina
       });
       this.CartasGenRepository.update(lastCartaGen[0].id, { cantidadGenerada: count_cg, fechaActualizacion: fecha_actualizacion, revisado: false });
       const filepath = path.join(__dirname, "..", "..", "public", "documentos", lastCartaGen[0].nombreArchivo);
@@ -119,25 +105,31 @@ export class CartasGenService {
       );
       return 'Carta Actualizada';
     } else {
-      const extracto_1 = "";
-      const extracto_2 = "";
-      const extracto_3 = "";
-      const extracto_4 = "";
+      let extracto_1 = "";
+      let extracto_2 = "";
+      let extracto_3 = "";
+      let extracto_4 = "";
       if (alumno.sexo == "femenino") {
-        const extracto_1 = "nuestra alumna Señorita";
-        const extracto2 = "alumna";
-        const extracto3 = "La señorita";
-        const extracto4 = "LA ALUMNA";
+        extracto_1 = "nuestra alumna Señorita";
+        extracto_2 = "alumna";
+        extracto_3 = "La señorita";
+        extracto_4 = "LA ALUMNA";
       }
       else if (alumno.sexo == "masculino") {
-        let extracto_1 = "nuestro alumno Señor";
-        const extracto_2 = "alumno";
-        const extracto_3 = "El señor";
-        const extracto_4 = "EL ALUMNO";
+        extracto_1 = "nuestro alumno Señor";
+        extracto_2 = "alumno";
+        extracto_3 = "El señor";
+        extracto_4 = "EL ALUMNO";
       }
-
       const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
       const mesNombre = meses[new Date().getMonth()];
+      const firmas = await this.firmasService.findBySede(alumno.sede);
+      let piepagina = "";
+      if (alumno.sede == "Valparaíso") {
+        piepagina = "Las Heras Nº 06 Valparaíso | Fono: (32) 250 7961- 2507815 | E-mail: practivasv@uv.cl, www.uv.cl";
+      } else if (alumno.sede == "Santiago") {
+        piepagina = "Campus Santiago - Gran Avenida 4160, San Miguel | Fono +56 (2)2329  2149";
+      }
       this.dockGeneratorService.crear_cg({
         nombre_archivo: alumno.run + '-carta_generica.docx',
         sede: alumno.sede,
@@ -149,7 +141,7 @@ export class CartasGenService {
         segundo_nombre: alumno.segundoNombre,
         apellido_paterno: alumno.apellidoPaterno,
         apellido_materno: alumno.apellidoMaterno,
-        run: alumno.run + "-" + alumno.df,
+        run: alumno.run + "-" + alumno.df.toUpperCase(),
         extracto2: extracto_2,
         extracto3: extracto_3,
         ultimo_sem_aprobado: alumno.ultimoSemAprobado,

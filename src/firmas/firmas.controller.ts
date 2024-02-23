@@ -7,6 +7,11 @@ import { UpdateFirmaDto } from './dto/update-firma.dto';
 export class FirmasController {
   constructor(private readonly firmasService: FirmasService) {}
 
+  @Get('sede/:sede')
+  findBySede(@Param('sede') sede: string) {
+    return this.firmasService.findBySede(sede);
+  }
+
   @Post()
   create(@Body() createFirmaDto: CreateFirmaDto) {
     return this.firmasService.create(createFirmaDto);
