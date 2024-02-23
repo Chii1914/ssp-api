@@ -7,7 +7,33 @@ import { Repository } from 'typeorm';
 import { AlumnoService } from '../alumno/alumno.service';
 import { Alumno } from '../alumno/entities/alumno.entity';
 import { MailerService } from '../mailer/mailer.service';
+import { DockGeneratorService } from 'src/dock_generator/dock_generator.service';
 import * as path from 'path';
+import { Usuario } from 'src/usuarios/entities/usuario.entity';
+import { UsuariosService } from '../usuarios/usuarios.service';
+
+/*
+nombre_archivo: data['nombre_archivo'],
+            sede: data['sede'],
+            dia:  data['dia'],
+            mes: data['mes'],
+            anio: data['anio'],
+            extracto1: data['extracto1'],
+            primer_nombre: data['primer_nombre'],
+            segundo_nombre: data['segundo_nombre'],
+            apellido_paterno: data['apellido_paterno'],
+            apellido_materno: data['apellido_materno'],
+            run: data['rut'],
+            extracto2: data['extracto2'],
+            extracto3: data['extracto3'],
+            ultimo_sem_aprobado: data['ultimo_sem_aprobado'],
+            nombre_firmante: data['nombre_firmante'],
+            cargo_firmante: data['cargo_firmante'],
+            firma_firmante: data['firma_firmante'],
+            firma_sec: data['firma_sec'],
+            extracto4: data['extracto4'],
+            piepagina: data['piepagina'],
+ */
 
 @Injectable()
 export class CartasGenService {
@@ -15,8 +41,11 @@ export class CartasGenService {
   constructor(
     @InjectRepository(CartasGen) private CartasGenRepository: Repository<CartasGen>,
     @InjectRepository(Alumno) private alumnoRepository: Repository<Alumno>,
+    @InjectRepository(Usuario) private usuarioRepository: Repository<Usuario>,
     private mailerService: MailerService,
-    private alumnoService: AlumnoService) { }
+    private dockGeneratorService: DockGeneratorService,
+    private alumnoService: AlumnoService,
+    private usuarioService: UsuariosService) { }
 
 
   async createById(rut: number, createCartasGenDto: CreateCartasGenDto) {
@@ -36,8 +65,6 @@ export class CartasGenService {
       .innerJoinAndSelect('carta.estudiante', 'alumno')
       .where('carta.estudiante_id = :id', { id: alumno.id })
       .getMany();
-    //console.log(lastCartaGen)
-    console.log(lastCartaGen[0].nombreArchivo)
     if (lastCartaGen.length > 0) {
       //Caso en el que existe una carta generada anteriormente
 
@@ -46,7 +73,56 @@ export class CartasGenService {
       const fecha_actualizacion = new Date();
       //Sobreescribir documento nuevo 
       //TODO
+      const extracto_1 = "";
+      const extracto_2 = "";
+      const extracto_3 = "";
+      const extracto_4 = "";
+      if (alumno.sexo == "femenino") {
+        const extracto_1 = "nuestra alumna Señorita";
+        const extracto2 = "alumna";
+        const extracto3 = "La señorita";
+        const extracto4 = "LA ALUMNA";
+      }
+      else if (alumno.sexo == "masculino") {
+        let extracto_1 = "nuestro alumno Señor";
+        const extracto2 = "alumno";
+        const extracto3 = "El señor";
+        const extracto4 = "EL ALUMNO";
+      }
+      //Para después modificando la bd
+      /*
+      if (alumno.sexo == "na") {
+        const extracto1 = "nuestro/a alumno/a Señor/a";
+        const extracto2 = "alumno/a";
+        const extracto3 = "El/LA señor/a";
+        const extracto4 = "EL/LA ALUMNO/A";
+      }
+      */
 
+      const correos = await this.usuarioService.findAllSede(alumno.sede);
+      const correosStr = correos.map(usuario => usuario.correo).join(', ');
+      this.dockGeneratorService.crear_cg({
+        nombre_archivo: lastCartaGen[0].nombreArchivo,
+        sede: alumno.sede,
+        dia: new Date().getDate(),
+        mes: new Date().getMonth(),
+        anio: new Date().getFullYear(),
+        extracto1: extracto_1,
+        primer_nombre: alumno.primerNombre,
+        segundo_nombre: alumno.segundoNombre,
+        apellido_paterno: alumno.apellidoPaterno,
+        apellido_materno: alumno.apellidoMaterno,
+        run: alumno.run,
+        extracto2: extracto_2,
+        extracto3: extracto_3,
+        ultimo_sem_aprobado: alumno.ultimoSemAprobado,
+        nombre_firmante: "Nombre Firmante",
+        cargo_firmante: "Cargo Firmante",
+        firma_firmante: "Firma Firmante",
+        firma_sec: "Firma Secretaria",
+        extracto4: extracto_4,
+        piepagina: "Pie de página"
+      });
 
       //Guardar en database la actualización y actualizar enteramente la carta generada
       this.CartasGenRepository.update(lastCartaGen[0].id, { cantidadGenerada: count_cg, fechaActualizacion: fecha_actualizacion, revisado: false });
@@ -60,7 +136,7 @@ export class CartasGenService {
         'Actualización Carta Generica', //Subject
         'Usted ha generado una nueva carta generica, adjunta a este correo se encuentra el archivo correspondiente.', //Text
         '', //HTML
-        'maximiliano.aguirre@alumnos.uv.cl, mgfaundes@gmail.com', //CC
+        correosStr, //CC
         lastCartaGen[0].nombreArchivo, //Nombre del archivo
         filepath //Path del archivo
       );
@@ -68,9 +144,49 @@ export class CartasGenService {
 
     } else {
       //Caso en el que la carta fue generada por primera vez
-
+      
       //En este caso crear una carta genérica con los datos del estudiante
       //TODO
+      const extracto_1 = "";
+      const extracto_2 = "";
+      const extracto_3 = "";
+      const extracto_4 = "";
+
+
+      if (alumno.sexo == "femenino") {
+        const extracto_1 = "nuestra alumna Señorita";
+        const extracto2 = "alumna";
+        const extracto3 = "La señorita";
+        const extracto4 = "LA ALUMNA";
+      }
+      else if (alumno.sexo == "masculino") {
+        let extracto_1 = "nuestro alumno Señor";
+        const extracto2 = "alumno";
+        const extracto3 = "El señor";
+        const extracto4 = "EL ALUMNO";
+      }
+      this.dockGeneratorService.crear_cg({
+        nombre_archivo: alumno.run + '-carta_generica.docx',
+        sede: alumno.sede,
+        dia: new Date().getDate(),
+        mes: new Date().getMonth(),
+        anio: new Date().getFullYear(),
+        extracto1: extracto_1,
+        primer_nombre: alumno.primerNombre,
+        segundo_nombre: alumno.segundoNombre,
+        apellido_paterno: alumno.apellidoPaterno,
+        apellido_materno: alumno.apellidoMaterno,
+        run: alumno.run,
+        extracto2: extracto_2,
+        extracto3: extracto_3,
+        ultimo_sem_aprobado: alumno.ultimoSemAprobado,
+        nombre_firmante: "Nombre Firmante",
+        cargo_firmante: "Cargo Firmante",
+        firma_firmante: "Firma Firmante",
+        firma_sec: "Firma Secretaria",
+        extracto4: extracto_4,
+        piepagina: "Pie de página"
+      });
 
       //Guardar en database la carta generada
       const newCarta = this.CartasGenRepository.create({
