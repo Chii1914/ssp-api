@@ -18,7 +18,6 @@ export class CartasGenService {
 
   constructor(
     @InjectRepository(CartasGen) private CartasGenRepository: Repository<CartasGen>,
-    @InjectRepository(Alumno) private alumnoRepository: Repository<Alumno>,
     @InjectRepository(Usuario) private usuarioRepository: Repository<Usuario>,
     private mailerService: MailerService,
     private dockGeneratorService: DockGeneratorService,
