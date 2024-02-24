@@ -5,7 +5,12 @@ import { UpdateCartasGenDto } from './dto/update-cartas-gen.dto';
 
 @Controller('cartas-gen')
 export class CartasGenController {
-  constructor(private readonly cartasGenService: CartasGenService) {}
+  constructor(private readonly cartasGenService: CartasGenService) { }
+
+  @Post(':rut')
+  createByRut(@Param('rut') rut: number, @Body() createCartasGenDto: CreateCartasGenDto) {
+    return this.cartasGenService.createById(rut, createCartasGenDto);
+  }
 
   @Post()
   create(@Body() createCartasGenDto: CreateCartasGenDto) {

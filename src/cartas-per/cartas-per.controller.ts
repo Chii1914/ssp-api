@@ -7,6 +7,22 @@ import { UpdateCartasPerDto } from './dto/update-cartas-per.dto';
 export class CartasPerController {
   constructor(private readonly cartasPerService: CartasPerService) {}
 
+  @Post(':rut')
+  createByRut(@Param('rut') rut: number, @Body() createCartasGenDto: CreateCartasPerDto) {
+    const {nombreOrganismo, nombreSupervisor, cargoSupervisor, sexoSupervisor, divisionDepartamento, seccionUnidad } = createCartasGenDto;
+    return this.cartasPerService.createById(
+      nombreOrganismo,
+      nombreSupervisor,
+      cargoSupervisor,
+      sexoSupervisor,
+      divisionDepartamento,
+      seccionUnidad,
+      rut,
+      createCartasGenDto
+    );
+  }
+
+
   @Post()
   create(@Body() createCartasPerDto: CreateCartasPerDto) {
     return this.cartasPerService.create(createCartasPerDto);

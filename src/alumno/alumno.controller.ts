@@ -3,9 +3,16 @@ import { AlumnoService } from './alumno.service';
 import { CreateAlumnoDto } from './dto/create-alumno.dto';
 import { UpdateAlumnoDto } from './dto/update-alumno.dto';
 
+
 @Controller('alumno')
 export class AlumnoController {
   constructor(private readonly alumnoService: AlumnoService) {}
+  
+  //alumno/id/:rut
+  @Get('id/:rut')
+  obtainIdByRut(@Param('rut') rut: number) {
+    return this.alumnoService.obtainIdByRut(rut);
+  }
 
   @Post()
   create(@Body() createAlumnoDto: CreateAlumnoDto) {
@@ -16,7 +23,7 @@ export class AlumnoController {
   findAll() {
     return this.alumnoService.findAll();
   }
-
+ 
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.alumnoService.findOne(+id);

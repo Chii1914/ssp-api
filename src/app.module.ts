@@ -12,6 +12,8 @@ import { NotasModule } from './notas/notas.module';
 import { FirmasModule } from './firmas/firmas.module';
 import { RegionModule } from './region/region.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
+import { MailerModule } from './mailer/mailer.module';
+import { DockGeneratorModule } from './dock_generator/dock_generator.module';
 
 @Module({
   imports: [
@@ -36,7 +38,10 @@ import { UsuariosModule } from './usuarios/usuarios.module';
     NotasModule,
     FirmasModule,
     RegionModule,
-    UsuariosModule,],
+    UsuariosModule,
+    MailerModule,
+    DockGeneratorModule,
+    ],
   controllers: [],
   providers: [],
 })
