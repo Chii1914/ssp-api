@@ -2,6 +2,10 @@ import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateCartasPerDto {
 
+    @IsOptional()
+    @IsString()
+    readonly nombreArchivo: string;
+
     @IsString()
     readonly nombreSupervisor: string;
 

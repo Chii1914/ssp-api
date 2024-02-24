@@ -168,7 +168,7 @@ export class CartasGenService {
       const filepath = path.join(__dirname, "..", "..", "public", "documentos", alumno.run.toString() ,alumno.run + '-carta_generica.docx');
       await this.mailerService.sendMail(
         alumno.correoInstitucional, //to
-        'Actualización Carta Generica', //Subject
+        'Creación Carta Generica', //Subject
         'Usted ha generado una nueva carta generica, adjunta a este correo se encuentra el archivo correspondiente.', //Text
         '', //HTML
         correosStr, //CC
