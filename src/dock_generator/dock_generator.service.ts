@@ -3,14 +3,16 @@ import PizZip from 'pizzip';
 import Docxtemplater from 'docxtemplater';
 import * as fs from 'fs';
 import * as path from 'path';
+import e from 'express';
 
 
 @Injectable()
 export class DockGeneratorService {
 
    crear_cg(data: Object) {
+        fs.mkdir(path.join(__dirname, "..", "..", "public", "documentos", data['run'].toString()), { recursive: true }, (err) => { console.log(err) });
         const pathTemplate = path.join(__dirname, "..", "..", "public", "plantillas", "carta_generica_plantilla.docx");
-        const outputPath = path.join(__dirname, "..", "..", "public", "documentos");
+        const outputPath = path.join(__dirname, "..", "..", "public", "documentos", data['run'].toString());
         const content = fs.readFileSync(path.resolve(pathTemplate), 'binary'); //De donde se lee la template 
         const zip = new PizZip(content);
         const doc = new Docxtemplater(zip, {
@@ -46,15 +48,16 @@ export class DockGeneratorService {
     }
 
     crear_cp(data: Object) { 
+        fs.mkdir(path.join(__dirname, "..", "..", "public", "documentos", data['run'].toString()), { recursive: true }, (err) => { console.log(err) });
         const pathTemplate = path.join(__dirname, "..", "..", "public", "plantillas", "carta_personalizada_plantilla.docx");
-        const outputPath = path.join(__dirname, "..", "..", "public", "documentos", data['run'].toString()); //CREAR CARPETA CON EL RUT DEL ALUMNO RECURSIVAMENTE
+        const outputPath = path.join(__dirname, "..", "..", "public", "documentos", data['run'].toString()); 
         const content = fs.readFileSync(path.resolve(pathTemplate), 'binary'); //De donde se lee la template 
         const zip = new PizZip(content);
         const doc = new Docxtemplater(zip, {
             paragraphLoop: true,
             linebreaks: true,
         });
-        console.log(data)
+        console.log(data, data['nombre_supervisor'])
         doc.render({
             sede: data['sede'],
             dia:  data['dia'],

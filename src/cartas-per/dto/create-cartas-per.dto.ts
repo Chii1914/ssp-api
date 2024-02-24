@@ -6,7 +6,7 @@ export class CreateCartasPerDto {
     readonly nombreSupervisor: string;
 
     @IsString()
-    readonly organismo: string;
+    readonly cargoSupervisor: string;
 
     @IsString()
     readonly nombreOrganismo: string;

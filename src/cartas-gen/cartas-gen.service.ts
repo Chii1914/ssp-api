@@ -80,6 +80,7 @@ export class CartasGenService {
         segundo_nombre: alumno.segundoNombre,
         apellido_paterno: alumno.apellidoPaterno,
         apellido_materno: alumno.apellidoMaterno,
+        run: alumno.run,
         rut: alumno.run + "-" + alumno.df.toUpperCase(),
         extracto2: extracto_2,
         extracto3: extracto_3,
@@ -92,7 +93,7 @@ export class CartasGenService {
         piepagina: piepagina
       });
       this.CartasGenRepository.update(lastCartaGen[0].id, { cantidadGenerada: count_cg, fechaActualizacion: fecha_actualizacion, revisado: false });
-      const filepath = path.join(__dirname, "..", "..", "public", "documentos", lastCartaGen[0].nombreArchivo);
+      const filepath = path.join(__dirname, "..", "..", "public", "documentos", alumno.run.toString() ,lastCartaGen[0].nombreArchivo);
       await this.mailerService.sendMail(
         alumno.correoInstitucional, //to
         'Actualización Carta Generica', //Subject
@@ -129,6 +130,7 @@ export class CartasGenService {
       } else if (alumno.sede == "Santiago") {
         piepagina = "Campus Santiago - Gran Avenida 4160, San Miguel | Fono +56 (2)2329  2149";
       }
+      
       this.dockGeneratorService.crear_cg({
         nombre_archivo: alumno.run + '-carta_generica.docx',
         sede: alumno.sede,
@@ -140,16 +142,17 @@ export class CartasGenService {
         segundo_nombre: alumno.segundoNombre,
         apellido_paterno: alumno.apellidoPaterno,
         apellido_materno: alumno.apellidoMaterno,
-        run: alumno.run + "-" + alumno.df.toUpperCase(),
+        run: alumno.run,
+        rut: alumno.run + "-" + alumno.df.toUpperCase(),
         extracto2: extracto_2,
         extracto3: extracto_3,
         ultimo_sem_aprobado: alumno.ultimoSemAprobado,
-        nombre_firmante: "Nombre Firmante",
-        cargo_firmante: "Cargo Firmante",
-        firma_firmante: "Firma Firmante",
-        firma_sec: "Firma Secretaria",
+        nombre_firmante: firmas[0].nombreFirmante,
+        cargo_firmante: firmas[0].cargo,
+        firma_firmante: firmas[0].vocativo,
+        firma_sec: firmas[0].firmaSec,
         extracto4: extracto_4,
-        piepagina: "Pie de página"
+        piepagina: piepagina
       });
       const newCarta = this.CartasGenRepository.create({
         estudianteId: alumno.id,
@@ -162,14 +165,14 @@ export class CartasGenService {
       await this.CartasGenRepository.save(newCarta);
       const correos = await this.usuarioService.findAllSede(alumno.sede);
       const correosStr = correos.map(usuario => usuario.correo).join(', ');
-      const filepath = path.join(__dirname, "..", "..", "public", "documentos", alumno.run + '-carta_generica.docx');
+      const filepath = path.join(__dirname, "..", "..", "public", "documentos", alumno.run.toString() ,alumno.run + '-carta_generica.docx');
       await this.mailerService.sendMail(
         alumno.correoInstitucional, //to
         'Actualización Carta Generica', //Subject
         'Usted ha generado una nueva carta generica, adjunta a este correo se encuentra el archivo correspondiente.', //Text
         '', //HTML
         correosStr, //CC
-        lastCartaGen[0].nombreArchivo, //Nombre del archivo
+        alumno.run + '-carta_generica.docx', //Nombre del archivo
         filepath //Path del archivo
       );
       return 'Carta creada';
