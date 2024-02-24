@@ -16,7 +16,6 @@ import { last, retry } from 'rxjs';
 
 @Injectable()
 export class CartasPerService {
-
   constructor(
     @InjectRepository(CartasPer) private CartasPerRepository: Repository<CartasPer>,
     @InjectRepository(Alumno) private alumnoRepository: Repository<Alumno>,
@@ -30,9 +29,7 @@ export class CartasPerService {
   create(createCartasPerDto: CreateCartasPerDto) {
     return 'This action adds a new cartasPer';
   }
-
   async createById(nombreSupervisor: string, organismo: string, nombreOrganismo: string, sexoSupervisor: string, divisionDepartamento: string, seccionUnidad: string, rut: number, createCartasPerDto: CreateCartasPerDto) {
-
     //Aquí entran datos como 
     /*
     Organismo
@@ -51,7 +48,6 @@ export class CartasPerService {
       extracto1_supervisor = "Señora";
       extracto2_supervisor = "Estimada Señora";
     }
-
     const alumno = await this.alumnoService.obtainIdByRut(rut);
     const lastCartaPer = await this.CartasPerRepository.createQueryBuilder('carta')
       .innerJoinAndSelect('carta.estudiante', 'alumno')

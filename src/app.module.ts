@@ -40,7 +40,8 @@ import { DockGeneratorModule } from './dock_generator/dock_generator.module';
     RegionModule,
     UsuariosModule,
     MailerModule,
-    DockGeneratorModule,],
+    DockGeneratorModule,
+    ],
   controllers: [],
   providers: [],
 })
