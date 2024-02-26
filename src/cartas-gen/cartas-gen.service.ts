@@ -200,3 +200,5 @@ export class CartasGenService {
     return `This action removes a #${id} cartasGen`;
   }
 }
+
+

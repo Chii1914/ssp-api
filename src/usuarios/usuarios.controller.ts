@@ -32,3 +32,21 @@ export class UsuariosController {
     return this.usuariosService.remove(+id);
   }
 }
+
+/*
+
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+@Controller('protected')
+export class ProtectedController {
+  @Get()
+  @UseGuards(AuthGuard('jwt'))
+  findAll() {
+    // This route is now protected
+    return "This is a protected route";
+  }
+}
+
+
+*/
