@@ -7,6 +7,7 @@ Rest API make for handle request's from a webpage
 
 ## Environment variables
 
+```bash
 MAIL_HOST
 ->STMP HOST
 MAIL_USER
@@ -29,6 +30,7 @@ DB_NAME
 ->Use 'practica'
 TYPEORM_SYNC
 ->Always false, do not change in production stages 
+```
 
 ## Installation
 
