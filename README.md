@@ -9,27 +9,27 @@ Rest API make for handle request's from a webpage
 
 ```bash
 MAIL_HOST
-->STMP HOST
+#STMP HOST
 MAIL_USER
-->STMP MAIL
+#STMP MAIL
 MAIL_PASS
-->MAIL PASS FOR STMP
+#MAIL PASS FOR STMP
 MAIL_PORT
-->Default 465 and 578. 465 SSL & 578 TLS 
+#Default 465 and 578. 465 SSL & 578 TLS 
 TYPE_BD
-->Unused
+#Unused
 DB_HOST
-->Database server ip
+#Database server ip
 DB_PORT
-->Port of the database
+#Port of the database
 DB_USERNAME
-->Username for the database
+#Username for the database
 DB_PASSWORD
-->Password for the database
+#Password for the database
 DB_NAME
-->Use 'practica'
+#Use 'practica'
 TYPEORM_SYNC
-->Always false, do not change in production stages 
+#Always false, do not change in production stages 
 ```
 
 ## Installation
