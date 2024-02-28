@@ -250,8 +250,14 @@ export class CartasGenService {
     return `This action updates a #${id} cartasGen`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} cartasGen`;
+  async remove(run: string) {
+    const cartas = await this.CartasGenRepository //Obtiene la id de la carta por el run
+      .createQueryBuilder('carta')
+      .innerJoin('carta.estudiante', 'alumno', 'alumno.run = :run', { run })
+      .select('carta.id')
+      .getRawMany();
+    
+      return await this.CartasGenRepository.delete(cartas[0].carta_id);
   }
 }
 

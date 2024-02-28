@@ -4,6 +4,7 @@ import { CreateCartasPerDto } from './dto/create-cartas-per.dto';
 import { UpdateCartasPerDto } from './dto/update-cartas-per.dto';
 import { Response } from 'express';
 import { FilesService } from 'src/files/files.service';
+import { run } from 'node:test';
 
 @Controller('cartas-per')
 export class CartasPerController {
@@ -74,8 +75,8 @@ export class CartasPerController {
     return this.cartasPerService.update(+id, updateCartasPerDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cartasPerService.remove(+id);
+  @Delete(':run')
+  remove(@Param('run') run: string) {
+    return this.cartasPerService.remove(run);
   }
 }

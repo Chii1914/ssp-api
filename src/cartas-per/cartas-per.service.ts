@@ -283,7 +283,12 @@ export class CartasPerService {
     return `This action updates a #${id} cartasPer`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} cartasPer`;
+  async remove(run: string) {
+    const cartas = await this.CartasPerRepository //Obtiene la id de la carta por el run
+      .createQueryBuilder('carta')
+      .innerJoin('carta.estudiante', 'alumno', 'alumno.run = :run', { run })
+      .select('carta.id')
+      .getRawMany();
+    return await this.CartasPerRepository.delete(cartas[0].carta_id);
   }
 }

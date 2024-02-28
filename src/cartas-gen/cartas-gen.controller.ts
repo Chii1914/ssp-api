@@ -4,6 +4,7 @@ import { CreateCartasGenDto } from './dto/create-cartas-gen.dto';
 import { UpdateCartasGenDto } from './dto/update-cartas-gen.dto';
 import { Response } from 'express';
 import { FilesService } from '../files/files.service';
+import { run } from 'node:test';
 
 @Controller('cartas-gen')
 export class CartasGenController {
@@ -61,8 +62,8 @@ export class CartasGenController {
     return this.cartasGenService.update(+id, updateCartasGenDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cartasGenService.remove(+id);
+  @Delete(':run')
+  remove(@Param('run') run: string) {
+    return this.cartasGenService.remove(run);
   }
 }
