@@ -13,6 +13,7 @@ import { UsuariosService } from '../usuarios/usuarios.service';
 import { FirmasService } from '../firmas/firmas.service';
 import { CartasPer } from './entities/cartas-per.entity';
 import { last, retry } from 'rxjs';
+import * as fs from 'fs';
 
 @Injectable()
 export class CartasPerService {
@@ -25,6 +26,9 @@ export class CartasPerService {
     private alumnoService: AlumnoService,
     private usuarioService: UsuariosService,
     private firmasService: FirmasService) { }
+
+    private readonly directoryPath = path.join(__dirname, '..', '..', 'public', 'documentos');
+
 
   create(createCartasPerDto: CreateCartasPerDto) {
     return 'This action adds a new cartasPer';

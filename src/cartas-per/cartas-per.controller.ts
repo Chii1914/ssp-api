@@ -1,11 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, Res } from '@nestjs/common';
 import { CartasPerService } from './cartas-per.service';
 import { CreateCartasPerDto } from './dto/create-cartas-per.dto';
 import { UpdateCartasPerDto } from './dto/update-cartas-per.dto';
+import { Response } from 'express';
+import { FilesService } from 'src/files/files.service';
 
 @Controller('cartas-per')
 export class CartasPerController {
-  constructor(private readonly cartasPerService: CartasPerService) {}
+  constructor(private readonly cartasPerService: CartasPerService, private readonly filesService: FilesService) {}
 
   @Post(':rut')
   createByRut(@Param('rut') rut: number, @Body() createCartasGenDto: CreateCartasPerDto) {
@@ -26,6 +28,23 @@ export class CartasPerController {
   @Post()
   create(@Body() createCartasPerDto: CreateCartasPerDto) {
     return this.cartasPerService.create(createCartasPerDto);
+  }
+
+
+  @Get('file/:rut')
+  async getFile(@Param('rut') rut: string, @Res() res: Response) {
+    const file = this.filesService.getFile(rut + '/' + rut + '-carta_personalizada.docx');
+
+    if (!file) {
+      throw new NotFoundException('File not found');
+    }
+
+    res.download(file.path, rut  + '-carta_personalizada', (err) => {
+      if (err) {
+        // Log error internally; don't expose details to the client
+        throw new NotFoundException('File not found');
+      }
+    });
   }
 
   @Get('snrev/:sede')

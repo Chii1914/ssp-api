@@ -24,6 +24,7 @@ import { RolesGuard } from './common/roles/roles.guard';
 import { AuthService } from './auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtModule } from '@nestjs/jwt';
+import { FilesModule } from './files/files.module';
 
 
 @Module({
@@ -65,6 +66,7 @@ import { JwtModule } from '@nestjs/jwt';
     DockGeneratorModule,
     AuthModule,
     UserModule,
+    FilesModule,
   ],
   controllers: [],
   providers: [{

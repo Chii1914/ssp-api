@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Res } from '@nestjs/common';
 import { CreateCartasGenDto } from './dto/create-cartas-gen.dto';
 import { UpdateCartasGenDto } from './dto/update-cartas-gen.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,6 +12,7 @@ import * as path from 'path';
 import { Usuario } from 'src/usuarios/entities/usuario.entity';
 import { UsuariosService } from '../usuarios/usuarios.service';
 import { FirmasService } from '../firmas/firmas.service';
+import * as fs from 'fs';
 
 @Injectable()
 export class CartasGenService {
@@ -23,7 +24,11 @@ export class CartasGenService {
     private dockGeneratorService: DockGeneratorService,
     private alumnoService: AlumnoService,
     private usuarioService: UsuariosService,
-    private firmasService: FirmasService) { }
+    private firmasService: FirmasService,
+  ) { }
+
+  private readonly directoryPath = path.join(__dirname, '..', '..', 'public', 'documentos');
+
   async createById(rut: number, createCartasGenDto: CreateCartasGenDto) {
     const alumno = await this.alumnoService.obtainIdByRut(rut);
     const lastCartaGen = await this.CartasGenRepository.createQueryBuilder('carta')
@@ -186,43 +191,43 @@ export class CartasGenService {
 
   async findAllsnRev(sede: string) {
     const alumno = await this.CartasGenRepository.createQueryBuilder('carta')
-    .innerJoinAndSelect('carta.estudiante', 'alumno')
-    .select([
-      'carta.id', 
-      'alumno.run', 
-      'alumno.primerNombre', 
-      'alumno.segundoNombre', 
-      'alumno.apellidoPaterno', 
-      'alumno.apellidoMaterno', 
-      'carta.revisado', 
-      'carta.nombre_archivo', 
-      'carta.fechaCreado', 
-      'carta.fechaActualizacion'
-    ])
-    .where('alumno.sede = :sede', { sede })
-    .andWhere('carta.revisado = :revisado', { revisado: false })
-    .orderBy('carta.id', 'DESC');
+      .innerJoinAndSelect('carta.estudiante', 'alumno')
+      .select([
+        'carta.id',
+        'alumno.run',
+        'alumno.primerNombre',
+        'alumno.segundoNombre',
+        'alumno.apellidoPaterno',
+        'alumno.apellidoMaterno',
+        'carta.revisado',
+        'carta.nombre_archivo',
+        'carta.fechaCreado',
+        'carta.fechaActualizacion'
+      ])
+      .where('alumno.sede = :sede', { sede })
+      .andWhere('carta.revisado = :revisado', { revisado: false })
+      .orderBy('carta.id', 'DESC');
     return alumno.getMany();
   }
 
   async findAllRev(sede: string) {
     const alumno = await this.CartasGenRepository.createQueryBuilder('carta')
-    .innerJoinAndSelect('carta.estudiante', 'alumno')
-    .select([
-      'carta.id', 
-      'alumno.run', 
-      'alumno.primerNombre', 
-      'alumno.segundoNombre', 
-      'alumno.apellidoPaterno', 
-      'alumno.apellidoMaterno', 
-      'carta.revisado', 
-      'carta.nombre_archivo', 
-      'carta.fechaCreado', 
-      'carta.fechaActualizacion'
-    ])
-    .where('alumno.sede = :sede', { sede })
-    .andWhere('carta.revisado = :revisado', { revisado: true })
-    .orderBy('carta.id', 'DESC');
+      .innerJoinAndSelect('carta.estudiante', 'alumno')
+      .select([
+        'carta.id',
+        'alumno.run',
+        'alumno.primerNombre',
+        'alumno.segundoNombre',
+        'alumno.apellidoPaterno',
+        'alumno.apellidoMaterno',
+        'carta.revisado',
+        'carta.nombre_archivo',
+        'carta.fechaCreado',
+        'carta.fechaActualizacion'
+      ])
+      .where('alumno.sede = :sede', { sede })
+      .andWhere('carta.revisado = :revisado', { revisado: true })
+      .orderBy('carta.id', 'DESC');
     return alumno.getMany();
   }
 
