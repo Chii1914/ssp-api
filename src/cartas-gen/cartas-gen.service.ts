@@ -256,6 +256,11 @@ export class CartasGenService {
       .innerJoin('carta.estudiante', 'alumno', 'alumno.run = :run', { run })
       .select('carta.id')
       .getRawMany();
+
+      if (cartas.length == 0) {
+        return 'No existe la carta';
+      }
+      
     
       return await this.CartasGenRepository.delete(cartas[0].carta_id);
   }
