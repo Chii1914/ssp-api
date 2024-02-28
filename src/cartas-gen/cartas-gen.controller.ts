@@ -45,6 +45,11 @@ export class CartasGenController {
     return this.cartasGenService.findAllRev(sede);
   }
 
+  @Patch(':rut')
+  updateByRut(@Param('rut') rut: string, @Body() updateCartasGenDto: UpdateCartasGenDto) {
+    return this.cartasGenService.updateByRun(rut, updateCartasGenDto);
+  }
+
 
   @Get(':id')
   findOne(@Param('id') id: string) {

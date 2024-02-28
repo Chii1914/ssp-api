@@ -18,6 +18,7 @@ import * as fs from 'fs';
 export class CartasGenService {
 
   constructor(
+    @InjectRepository(Alumno) private alumnoRepository: Repository<Alumno>,
     @InjectRepository(CartasGen) private CartasGenRepository: Repository<CartasGen>,
     @InjectRepository(Usuario) private usuarioRepository: Repository<Usuario>,
     private mailerService: MailerService,
@@ -229,6 +230,16 @@ export class CartasGenService {
       .andWhere('carta.revisado = :revisado', { revisado: true })
       .orderBy('carta.id', 'DESC');
     return alumno.getMany();
+  }
+
+  async updateByRun(run: string, updateCartasGenDto: UpdateCartasGenDto) {
+    const cartas = await this.CartasGenRepository //Obtiene la id de la carta por el run
+      .createQueryBuilder('carta')
+      .innerJoin('carta.estudiante', 'alumno', 'alumno.run = :run', { run })
+      .select('carta.id')
+      .getRawMany();
+
+      return await this.CartasGenRepository.update(cartas[0].carta_id, updateCartasGenDto);
   }
 
   findOne(id: number) {

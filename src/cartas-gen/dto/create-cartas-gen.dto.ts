@@ -1,4 +1,4 @@
-import { IsDate, IsIn,IsInt, IsString, IsOptional } from "class-validator";
+import { IsDate, IsIn,IsInt, IsString, IsOptional, IsBoolean } from "class-validator";
 
 export class CreateCartasGenDto {
 
@@ -11,8 +11,8 @@ export class CreateCartasGenDto {
     nombre_archivo: string;
 
     @IsOptional()
-    @IsIn([0,1])
-    revisado: number;
+    @IsBoolean()
+    revisado: boolean;
 
     @IsOptional()
     @IsDate()

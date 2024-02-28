@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateCartasPerDto {
 
@@ -23,5 +23,8 @@ export class CreateCartasPerDto {
 
     @IsString()
     readonly seccionUnidad: string;
+
+    @IsBoolean()
+    readonly revisado: boolean;
 
 }

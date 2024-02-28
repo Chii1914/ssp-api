@@ -266,6 +266,15 @@ export class CartasPerService {
     return cartas;
   }
 
+  async updateByRun(run: string, updateCartasPerDto: UpdateCartasPerDto) {
+    const cartas = await this.CartasPerRepository //Obtiene la id de la carta por el run
+      .createQueryBuilder('carta')
+      .innerJoin('carta.estudiante', 'alumno', 'alumno.run = :run', { run })
+      .select('carta.id')
+      .getRawMany();
+      return await this.CartasPerRepository.update(cartas[0].carta_id, updateCartasPerDto);
+  }
+
   findOne(id: number) {
     return `This action returns a #${id} cartasPer`;
   }

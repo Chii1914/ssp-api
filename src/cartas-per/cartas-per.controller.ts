@@ -47,6 +47,12 @@ export class CartasPerController {
     });
   }
 
+  @Patch(':rut')
+  updateByRut(@Param('rut') rut: string, @Body() updateCartasPerDto: UpdateCartasPerDto) {
+    return this.cartasPerService.updateByRun(rut, updateCartasPerDto);
+  }
+
+
   @Get('snrev/:sede')
   findAllsnRev(@Param('sede') sede: string){
     return this.cartasPerService.findAllsnRev(sede);
