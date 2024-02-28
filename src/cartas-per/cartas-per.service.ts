@@ -30,15 +30,6 @@ export class CartasPerService {
     return 'This action adds a new cartasPer';
   }
   async createById(nombreOrganismo: string, nombreSupervisor: string, cargoSupervisor:string, sexoSupervisor, divisionDepartamento:string, seccionUnidad:string,rut:number, createCartasPerDto: CreateCartasPerDto) {
-    //Aquí entran datos como 
-    /*
-    Organismo
-    Nombre Supervisor
-    Cargo Supervisor
-    Sexo del supervisor (H, M o NA)
-    División/Departamento
-    Sección/Unidad
-    */
     let extracto1_supervisor = "";
     let extracto2_supervisor = "";
     if (sexoSupervisor == "Masculino") {
@@ -138,7 +129,6 @@ export class CartasPerService {
       return 'Carta Actualizada';
     } else {
       const count_cp = 1;
-      const fecha_actualizacion = new Date();
       let extracto_1 = "";
       let extracto_2 = "";
       let extracto_3 = "";
@@ -223,10 +213,6 @@ export class CartasPerService {
       );
       return 'Carta creada';
     }
-
-
-
-    return 'This action adds a new cartasPer';
   }
 
 

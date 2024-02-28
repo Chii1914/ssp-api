@@ -14,20 +14,42 @@ import { RegionModule } from './region/region.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { MailerModule } from './mailer/mailer.module';
 import { DockGeneratorModule } from './dock_generator/dock_generator.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { getDatabaseType } from './config/config.utils';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './common/roles/roles.guard';
+import { AuthService } from './auth/auth.service';
+import { JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
+
 
 @Module({
   imports: [
-    CartasGenModule,
-    TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: '',
-      database: 'practica',
-      autoLoadEntities: true, // Automatically loads entities
-      synchronize: false, // BE CAREFUL WITH THIS WEA IN PRODUCTION
+    ConfigModule.forRoot({
+      isGlobal: true,
     }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService): Promise<TypeOrmModuleOptions> => ({
+        type: 'mysql',
+        host: configService.get<string>('DB_HOST') || 'localhost',
+        port: parseInt(configService.get<string>('DB_PORT')) || 3306,
+        username: configService.get<string>('DB_USERNAME') || 'root',
+        password: configService.get<string>('DB_PASSWORD') || '',
+        database: configService.get<string>('DB_NAME') || 'practica',
+        autoLoadEntities: true,
+        synchronize: configService.get<string>('TYPEORM_SYNC') === 'true',
+      }),
+      inject: [ConfigService], 
+    }),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET_KEY, // Use your JWT secret here
+      signOptions: { expiresIn: '60m' },
+    }),
+    CartasGenModule,
     AlumnoModule,
     CartasPerModule,
     PracticaModule,
@@ -41,8 +63,15 @@ import { DockGeneratorModule } from './dock_generator/dock_generator.module';
     UsuariosModule,
     MailerModule,
     DockGeneratorModule,
-    ],
+    AuthModule,
+    UserModule,
+  ],
   controllers: [],
-  providers: [],
+  providers: [{
+    provide: APP_GUARD,
+    useClass: RolesGuard,
+  },
+  AuthService,
+],
 })
 export class AppModule {}
