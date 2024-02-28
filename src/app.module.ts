@@ -19,6 +19,12 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { getDatabaseType } from './config/config.utils';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './common/roles/roles.guard';
+import { AuthService } from './auth/auth.service';
+import { JwtService } from '@nestjs/jwt';
+import { JwtModule } from '@nestjs/jwt';
+
 
 @Module({
   imports: [
@@ -39,6 +45,10 @@ import { AuthModule } from './auth/auth.module';
       }),
       inject: [ConfigService], 
     }),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET_KEY, // Use your JWT secret here
+      signOptions: { expiresIn: '60m' },
+    }),
     CartasGenModule,
     AlumnoModule,
     CartasPerModule,
@@ -57,6 +67,11 @@ import { AuthModule } from './auth/auth.module';
     UserModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [{
+    provide: APP_GUARD,
+    useClass: RolesGuard,
+  },
+  AuthService,
+],
 })
 export class AppModule {}
