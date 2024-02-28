@@ -17,9 +17,9 @@ export class CartasGenController {
     return this.cartasGenService.create(createCartasGenDto);
   }
 
-  @Get()
-  findAll() {
-    return this.cartasGenService.findAll();
+  @Get(':sede')
+  findAll(@Param('sede') sede: string){
+    return this.cartasGenService.findAll(sede);
   }
 
   @Get(':id')

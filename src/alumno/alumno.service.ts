@@ -23,7 +23,7 @@ export class AlumnoService {
   }
 
   findAll() {
-    return `This action returns all alumno`;
+    return this.alumnoRepository.find();
   }
  
   findOne(id: number) {

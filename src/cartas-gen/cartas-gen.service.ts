@@ -93,7 +93,7 @@ export class CartasGenService {
         piepagina: piepagina
       });
       this.CartasGenRepository.update(lastCartaGen[0].id, { cantidadGenerada: count_cg, fechaActualizacion: fecha_actualizacion, revisado: false });
-      const filepath = path.join(__dirname, "..", "..", "public", "documentos", alumno.run.toString() ,lastCartaGen[0].nombreArchivo);
+      const filepath = path.join(__dirname, "..", "..", "public", "documentos", alumno.run.toString(), lastCartaGen[0].nombreArchivo);
       await this.mailerService.sendMail(
         alumno.correoInstitucional, //to
         'Actualización Carta Generica', //Subject
@@ -130,7 +130,7 @@ export class CartasGenService {
       } else if (alumno.sede == "Santiago") {
         piepagina = "Campus Santiago - Gran Avenida 4160, San Miguel | Fono +56 (2)2329  2149";
       }
-      
+
       this.dockGeneratorService.crear_cg({
         nombre_archivo: alumno.run + '-carta_generica.docx',
         sede: alumno.sede,
@@ -165,7 +165,7 @@ export class CartasGenService {
       await this.CartasGenRepository.save(newCarta);
       const correos = await this.usuarioService.findAllSede(alumno.sede);
       const correosStr = correos.map(usuario => usuario.correo).join(', ');
-      const filepath = path.join(__dirname, "..", "..", "public", "documentos", alumno.run.toString() ,alumno.run + '-carta_generica.docx');
+      const filepath = path.join(__dirname, "..", "..", "public", "documentos", alumno.run.toString(), alumno.run + '-carta_generica.docx');
       await this.mailerService.sendMail(
         alumno.correoInstitucional, //to
         'Creación Carta Generica', //Subject
@@ -184,8 +184,25 @@ export class CartasGenService {
     return 'This action adds a new cartasGen';
   }
 
-  async findAll() {
-    return await this.CartasGenRepository.find();
+  async findAll(sede: string) {
+  console.log(await this.CartasGenRepository.find())
+    const alumno = await this.CartasGenRepository.createQueryBuilder('carta')
+    .innerJoinAndSelect('carta.estudiante', 'alumno')
+    .select([
+      'carta.id', 
+      'alumno.run', 
+      'alumno.primerNombre', 
+      'alumno.segundoNombre', 
+      'alumno.apellidoPaterno', 
+      'alumno.apellidoMaterno', 
+      'carta.revisado', 
+      'carta.nombre_archivo', 
+      'carta.fechaCreado', 
+      'carta.fechaActualizacion'
+    ])
+    .where('alumno.sede = :sede', { sede })
+    .orderBy('carta.id', 'DESC');
+    return alumno.getMany();
   }
 
   findOne(id: number) {
