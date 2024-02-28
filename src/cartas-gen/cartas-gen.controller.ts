@@ -17,10 +17,16 @@ export class CartasGenController {
     return this.cartasGenService.create(createCartasGenDto);
   }
 
-  @Get(':sede')
-  findAll(@Param('sede') sede: string){
-    return this.cartasGenService.findAll(sede);
+  @Get('snrev/:sede')
+  findAllsnRev(@Param('sede') sede: string){
+    return this.cartasGenService.findAllsnRev(sede);
   }
+
+  @Get('rev/:sede')
+  findAllRev(@Param('sede') sede: string){
+    return this.cartasGenService.findAllRev(sede);
+  }
+
 
   @Get(':id')
   findOne(@Param('id') id: string) {

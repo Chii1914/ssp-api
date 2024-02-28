@@ -216,8 +216,50 @@ export class CartasPerService {
   }
 
 
-  findAll() {
-    return `This action returns all cartasPer`;
+  async findAllsnRev(sede: string) {
+    const cartas = await this.CartasPerRepository
+    .createQueryBuilder('carta')
+    .leftJoinAndSelect('carta.estudiante', 'alumno')
+    .select([
+      'carta.id', 
+      'alumno.run', 
+      'alumno.primerNombre', 
+      'alumno.segundoNombre', 
+      'alumno.apellidoPaterno', 
+      'alumno.apellidoMaterno', 
+      'carta.nombre_archivo', 
+      'carta.revisado', 
+      'carta.fechaCreado', 
+      'carta.fechaActualizacion'
+    ])
+    .where('alumno.sede = :sede', { sede })
+    .andWhere('carta.revisado = :revisado', {revisado: false})
+    .orderBy('carta.id', 'DESC')
+    .getMany();
+    return cartas;
+  }
+
+  async findAllRev(sede: string) {
+    const cartas = await this.CartasPerRepository
+    .createQueryBuilder('carta')
+    .leftJoinAndSelect('carta.estudiante', 'alumno')
+    .select([
+      'carta.id', 
+      'alumno.run', 
+      'alumno.primerNombre', 
+      'alumno.segundoNombre', 
+      'alumno.apellidoPaterno', 
+      'alumno.apellidoMaterno', 
+      'carta.nombre_archivo', 
+      'carta.revisado', 
+      'carta.fechaCreado', 
+      'carta.fechaActualizacion'
+    ])
+    .where('alumno.sede = :sede', { sede })
+    .andWhere('carta.revisado = :revisado', {revisado: true})
+    .orderBy('carta.id', 'DESC')
+    .getMany();
+    return cartas;
   }
 
   findOne(id: number) {

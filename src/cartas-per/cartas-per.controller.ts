@@ -28,10 +28,16 @@ export class CartasPerController {
     return this.cartasPerService.create(createCartasPerDto);
   }
 
-  @Get()
-  findAll() {
-    return this.cartasPerService.findAll();
+  @Get('snrev/:sede')
+  findAllsnRev(@Param('sede') sede: string){
+    return this.cartasPerService.findAllsnRev(sede);
   }
+
+  @Get('rev/:sede')
+  findAllRev(@Param('sede') sede: string){
+    return this.cartasPerService.findAllRev(sede);
+  }
+
 
   @Get(':id')
   findOne(@Param('id') id: string) {

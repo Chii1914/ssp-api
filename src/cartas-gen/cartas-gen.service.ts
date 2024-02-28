@@ -184,8 +184,7 @@ export class CartasGenService {
     return 'This action adds a new cartasGen';
   }
 
-  async findAll(sede: string) {
-  console.log(await this.CartasGenRepository.find())
+  async findAllsnRev(sede: string) {
     const alumno = await this.CartasGenRepository.createQueryBuilder('carta')
     .innerJoinAndSelect('carta.estudiante', 'alumno')
     .select([
@@ -201,6 +200,28 @@ export class CartasGenService {
       'carta.fechaActualizacion'
     ])
     .where('alumno.sede = :sede', { sede })
+    .andWhere('carta.revisado = :revisado', { revisado: false })
+    .orderBy('carta.id', 'DESC');
+    return alumno.getMany();
+  }
+
+  async findAllRev(sede: string) {
+    const alumno = await this.CartasGenRepository.createQueryBuilder('carta')
+    .innerJoinAndSelect('carta.estudiante', 'alumno')
+    .select([
+      'carta.id', 
+      'alumno.run', 
+      'alumno.primerNombre', 
+      'alumno.segundoNombre', 
+      'alumno.apellidoPaterno', 
+      'alumno.apellidoMaterno', 
+      'carta.revisado', 
+      'carta.nombre_archivo', 
+      'carta.fechaCreado', 
+      'carta.fechaActualizacion'
+    ])
+    .where('alumno.sede = :sede', { sede })
+    .andWhere('carta.revisado = :revisado', { revisado: true })
     .orderBy('carta.id', 'DESC');
     return alumno.getMany();
   }
