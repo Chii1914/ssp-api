@@ -1,32 +1,26 @@
-import { Inject, Injectable, Res } from '@nestjs/common';
-import { CreateCartasGenDto } from './dto/create-cartas-gen.dto';
-import { UpdateCartasGenDto } from './dto/update-cartas-gen.dto';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CartasGen } from './entities/cartas-gen.entity';
 import { Repository } from 'typeorm';
+import { CreateCartasGenDto } from './dto/create-cartas-gen.dto';
+import { UpdateCartasGenDto } from './dto/update-cartas-gen.dto';
 import { AlumnoService } from '../alumno/alumno.service';
-import { Alumno } from '../alumno/entities/alumno.entity';
 import { MailerService } from '../mailer/mailer.service';
 import { DockGeneratorService } from 'src/dock_generator/dock_generator.service';
-import * as path from 'path';
-import { Usuario } from 'src/usuarios/entities/usuario.entity';
 import { UsuariosService } from '../usuarios/usuarios.service';
 import { FirmasService } from '../firmas/firmas.service';
-import * as fs from 'fs';
+import * as path from 'path';
 
 @Injectable()
 export class CartasGenService {
-
   constructor(
-    @InjectRepository(Alumno) private alumnoRepository: Repository<Alumno>,
     @InjectRepository(CartasGen) private CartasGenRepository: Repository<CartasGen>,
-    @InjectRepository(Usuario) private usuarioRepository: Repository<Usuario>,
+    private alumnoService: AlumnoService,
     private mailerService: MailerService,
     private dockGeneratorService: DockGeneratorService,
-    private alumnoService: AlumnoService,
     private usuarioService: UsuariosService,
     private firmasService: FirmasService,
-  ) { }
+  ) {}
 
   private readonly directoryPath = path.join(__dirname, '..', '..', 'public', 'documentos');
 
@@ -232,15 +226,30 @@ export class CartasGenService {
     return alumno.getMany();
   }
 
-  async updateByRun(run: string, updateCartasGenDto: UpdateCartasGenDto) {
-    const cartas = await this.CartasGenRepository //Obtiene la id de la carta por el run
-      .createQueryBuilder('carta')
-      .innerJoin('carta.estudiante', 'alumno', 'alumno.run = :run', { run })
-      .select('carta.id')
-      .getRawMany();
-
-      return await this.CartasGenRepository.update(cartas[0].carta_id, updateCartasGenDto);
+  async updateById(id: number, updateCartasGenDto: UpdateCartasGenDto): Promise<any> {
+    // Assuming id is a number and directly utilized to query
+    const carta = await this.CartasGenRepository.findOne({ where: { id: id } });
+    if (!carta) {
+      throw new NotFoundException(`Carta with ID ${id} not found`);
+    }
+    await this.CartasGenRepository.update(id, updateCartasGenDto);
+    return { affected: 1 };
   }
+
+  // Include the updateByRun method if it's still relevant
+  async updateByRun(run: string, updateCartasGenDto: UpdateCartasGenDto): Promise<any> {
+    const carta = await this.CartasGenRepository
+  .createQueryBuilder('carta')
+  .innerJoinAndSelect('carta.alumno', 'alumno')
+  .where('alumno.run = :run', { run: run })
+  .getOne();
+    if (!carta) {
+      throw new NotFoundException(`Carta with run ${run} not found`);
+    }
+    await this.CartasGenRepository.update(carta.id, updateCartasGenDto);
+    return { affected: 1 };
+  }
+
 
   findOne(id: number) {
     return `This action returns a #${id} cartasGen`;

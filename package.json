@@ -31,6 +31,7 @@
     "@types/nodemailer": "^6.4.14",
     "class-transformer": "0.5.1",
     "class-validator": "0.14.1",
+    "cors": "^2.8.5",
     "docxtemplater": "^3.46.0",
     "google-auth-library": "^9.6.3",
     "install": "^0.13.0",

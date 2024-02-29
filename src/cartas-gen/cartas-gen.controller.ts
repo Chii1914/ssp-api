@@ -46,9 +46,9 @@ export class CartasGenController {
     return this.cartasGenService.findAllRev(sede);
   }
 
-  @Patch(':rut')
-  updateByRut(@Param('rut') rut: string, @Body() updateCartasGenDto: UpdateCartasGenDto) {
-    return this.cartasGenService.updateByRun(rut, updateCartasGenDto);
+  @Patch('run/:run')
+  updateByRun(@Param('run') run: string, @Body() updateCartasGenDto: UpdateCartasGenDto): Promise<any> {
+    return this.cartasGenService.updateByRun(run, updateCartasGenDto);
   }
 
 
@@ -58,8 +58,8 @@ export class CartasGenController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCartasGenDto: UpdateCartasGenDto) {
-    return this.cartasGenService.update(+id, updateCartasGenDto);
+  update(@Param('id') id: string, @Body() updateCartasGenDto: UpdateCartasGenDto): Promise<any> {
+    return this.cartasGenService.updateById(+id, updateCartasGenDto);
   }
 
   @Delete(':run')
@@ -67,3 +67,9 @@ export class CartasGenController {
     return this.cartasGenService.remove(run);
   }
 }
+
+
+
+
+  // If you decide to implement updateByRun, ensure it's properly defined in your service
+  
