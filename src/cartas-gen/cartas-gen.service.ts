@@ -233,12 +233,12 @@ export class CartasGenService {
   }
 
   async updateByRun(run: string, updateCartasGenDto: UpdateCartasGenDto) {
+    console.log(run)
     const cartas = await this.CartasGenRepository //Obtiene la id de la carta por el run
       .createQueryBuilder('carta')
       .innerJoin('carta.estudiante', 'alumno', 'alumno.run = :run', { run })
       .select('carta.id')
       .getRawMany();
-
       return await this.CartasGenRepository.update(cartas[0].carta_id, updateCartasGenDto);
   }
 
