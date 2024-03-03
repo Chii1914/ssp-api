@@ -25,7 +25,6 @@ export class AuthService {
 
   async findOrCreateUser(email: string) {
     const admin = await this.usuarioRepository.find({ where: { correo: email } });
-    console.log(admin)
     if (admin!=null) {
       //Si es admin
       return { email: email, rol: "admin" };
