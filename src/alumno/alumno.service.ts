@@ -18,8 +18,13 @@ export class AlumnoService {
     return alumno;
   }
 
-  create(createAlumnoDto: CreateAlumnoDto) {
-    return 'This action adds a new alumno';
+  async create(createAlumnoDto: CreateAlumnoDto) {
+    try{
+      const alumno = this.alumnoRepository.create(createAlumnoDto);
+      return await this.alumnoRepository.save(alumno);
+    }catch(error){
+      console.log(error);
+    }
   }
 
   findAll() {
