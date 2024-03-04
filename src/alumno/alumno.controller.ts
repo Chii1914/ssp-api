@@ -14,6 +14,26 @@ export class AlumnoController {
     return this.alumnoService.obtainIdByRut(rut);
   }
 
+  @Get('ct-gen/:mail')
+  obtainCtGeneralByRut(@Param('mail') mail: string) {
+    return this.alumnoService.obtainCtGeneralByRut(mail);
+  }
+
+  @Get('ct-per/:mail')
+  obtainCpGeneralByRut(@Param('mail') mail: string) {
+    return this.alumnoService.obtainCpGeneralByRut(mail);
+  }
+
+  @Get('rev/:mail')
+  obtainAlumnoByMail(@Param('mail') mail: string){
+    return this.alumnoService.obtainAlumnoByMail(mail);
+  }
+
+  @Patch(':run')
+  updateByRun(@Param('run') run: number, @Body() updateAlumnoDto: UpdateAlumnoDto) {
+    return this.alumnoService.updateByRut(run, updateAlumnoDto);
+  }
+
   @Post()
   create(@Body() createAlumnoDto: CreateAlumnoDto) {
     return this.alumnoService.create(createAlumnoDto);
@@ -28,11 +48,12 @@ export class AlumnoController {
   findOne(@Param('id') id: string) {
     return this.alumnoService.findOne(+id);
   }
-
+  /*
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAlumnoDto: UpdateAlumnoDto) {
     return this.alumnoService.update(+id, updateAlumnoDto);
   }
+  */
 
   @Delete(':id')
   remove(@Param('id') id: string) {
