@@ -15,12 +15,7 @@ export class AuthController {
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   googleAuthRedirect(@Req() req, @Res() res: Response) {
-    // Handles the Google OAuth callback
-    const jwt: string = req.user.jwt;
-    const redirectUri = process.env.FRONTEND_URL;
-    // Redirect user with the JWT token, or send it however you prefer
-    //Responder con esta wea para luego manejarla en el frontend 
-    res.redirect(`${redirectUri}/success?token=${jwt}`);
+    res.redirect(`${process.env.FRONTEND_URL}/success?token=${req.user.jwt}`);
   }
 
   @Get('alumno')

@@ -33,13 +33,11 @@ export class AuthService {
       const alumno = await this.alumnoRepository.findOne({ where: { correoInstitucional: email } });
       if (alumno==null) {
         //Si no existe
-        console.log("alumno no existe")
         const newAlumno = await this.alumnoRepository.create({ correoInstitucional: email });
         await this.alumnoRepository.save(newAlumno);
         return { email: email, rol: "alumno" };        
       }else{
         //Si ya existe
-        console.log("alumno ya existe")
         return { email: email, rol: "alumno" };
       }
     }    
