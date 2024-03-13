@@ -63,8 +63,10 @@ export class AlumnoService {
     return `This action returns a #${id} alumno`;
   }
 
-  updateByRut(run: number, updateAlumnoDto: UpdateAlumnoDto) {
-    return this.alumnoRepository.update({run: run}, updateAlumnoDto);
+  
+
+  updateByRut(mail: string, updateAlumnoDto: UpdateAlumnoDto) {
+    return this.alumnoRepository.update({correoInstitucional: mail}, updateAlumnoDto);
   }
   
 

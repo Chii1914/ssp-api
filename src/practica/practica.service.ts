@@ -53,20 +53,33 @@ export class PracticaService {
 
 
   async verifyByMail(mail: string){
-    //Sin evaluar
-
     const alumno = await this.alumnoService.obtainAlumnoByMail(mail);
 
-    const count_snevaluar = await this.practicaRepository.createQueryBuilder("practica").where("practica.alumnoId = :id", { id: alumno.id }).andWhere("practica.ocasion = :ocasion", { ocasion: "Primera" }).andWhere("practica.estado = :estado", { estado: "Aceptada" }).andWhere("practica.evaluacionId IS NULL").getCount();
-    const count_snaccion = await this.practicaRepository.createQueryBuilder("practica").where("practica.alumnoId = :id", { id: alumno.id }).andWhere("practica.ocasion = :ocasion", { ocasion: "Primera" }).andWhere("practica.estado = :estado", { estado: "Sin Acción" }).andWhere("practica.evaluacionId IS NULL").getCount();
-    const count_evaluadas = await this.evaluacionesRepository.createQueryBuilder("evaluaciones").innerJoin("evaluaciones.practicas", "practica").where("practica.alumnoId = :id", { id: alumno.id }).andWhere("practica.ocasion = :ocasion", { ocasion: "Primera" }).andWhere("practica.estado = :estado", { estado: "Aceptada" }).andWhere("evaluaciones.evaluacion = :evaluacion", { evaluacion: "Aprobada" }).getCount();
+    const count_snevaluar = await this.practicaRepository.createQueryBuilder("practica")
+    .where("practica.alumnoId = :id", { id: alumno.id })
+    .andWhere("practica.ocasion = :ocasion", { ocasion: "Primera" })
+    .andWhere("practica.estado = :estado", { estado: "Aceptada" })
+    .andWhere("practica.evaluacionId IS NULL")
+    .getCount();
+    const count_snaccion = await this.practicaRepository.createQueryBuilder("practica").
+    where("practica.alumnoId = :id", { id: alumno.id })
+    .andWhere("practica.ocasion = :ocasion", { ocasion: "Primera" })
+    .andWhere("practica.estado = :estado", { estado: "Sin Acción" })
+    .andWhere("practica.evaluacionId IS NULL")
+    .getCount();
+    const count_evaluadas = await this.evaluacionesRepository.createQueryBuilder("evaluaciones")
+    .innerJoin("evaluaciones.practicas", "practica")
+    .where("practica.alumnoId = :id", { id: alumno.id })
+    .andWhere("practica.ocasion = :ocasion", { ocasion: "Primera" })
+    .andWhere("practica.estado = :estado", { estado: "Aceptada" })
+    .andWhere("evaluaciones.evaluacion = :evaluacion", { evaluacion: "Aprobada" })
+    .getCount();
     console.log(count_snevaluar, count_snaccion, count_evaluadas)
     if(count_snevaluar > 0 || count_evaluadas > 0 || count_snaccion > 0){
-      //Aquí ya se retorna la verificación
-      return true;
+      //Aquí ya se retorna la verificación actualmente posee un documento en procesamiento
+      return false;
     }
-
-    return false;
+    return true;
   }
 
   create(createPracticaDto: CreatePracticaDto) {

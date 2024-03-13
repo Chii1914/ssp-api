@@ -1,26 +1,26 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards, Request } from '@nestjs/common';
 import { PracticaService } from './practica.service';
 import { CreatePracticaDto } from './dto/create-practica.dto';
 import { UpdatePracticaDto } from './dto/update-practica.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { Roles } from 'src/common/roles/roles.decorator';
+
 
 @Controller('practica')
 export class PracticaController {
   constructor(private readonly practicaService: PracticaService) {}
 
   //Verifica si ya realizó una postulación prontamente hacer con front
-  @Get(':mail')
-  createById(@Param('mail') mail: string){
-    return this.practicaService.verifyByMail(mail);
+  @Get()
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('alumno')
+  verifyByMail(@Request() req: any){
+    return this.practicaService.verifyByMail(req.user.mail);
   }
 
   @Post()
   create(@Body() createPracticaDto: CreatePracticaDto) {
     return this.practicaService.create(createPracticaDto);
-  }
-
-  @Get()
-  findAll() {
-    return this.practicaService.findAll();
   }
 
 
