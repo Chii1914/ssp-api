@@ -7,6 +7,12 @@ import { UpdatePracticaDto } from './dto/update-practica.dto';
 export class PracticaController {
   constructor(private readonly practicaService: PracticaService) {}
 
+  //Verifica si ya realizó una postulación prontamente hacer con front
+  @Get(':mail')
+  createById(@Param('mail') mail: string){
+    return this.practicaService.verifyByMail(mail);
+  }
+
   @Post()
   create(@Body() createPracticaDto: CreatePracticaDto) {
     return this.practicaService.create(createPracticaDto);
@@ -17,10 +23,6 @@ export class PracticaController {
     return this.practicaService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.practicaService.findOne(+id);
-  }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePracticaDto: UpdatePracticaDto) {
