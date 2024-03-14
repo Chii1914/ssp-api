@@ -25,6 +25,7 @@ import { AuthService } from './auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { JwtModule } from '@nestjs/jwt';
 import { FilesModule } from './files/files.module';
+import { ComunaModule } from './comuna/comuna.module';
 
 
 @Module({
@@ -67,6 +68,7 @@ import { FilesModule } from './files/files.module';
     AuthModule,
     UserModule,
     FilesModule,
+    ComunaModule,
   ],
   controllers: [],
   providers: [{

@@ -2,6 +2,7 @@ import { Controller, Get, Req, UseGuards, Res } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { Roles } from 'src/common/roles/roles.decorator';
+import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -18,14 +19,23 @@ export class AuthController {
     res.redirect(`${process.env.FRONTEND_URL}/success?token=${req.user.jwt}`);
   }
 
-  @Get('alumno')
-  @UseGuards(AuthGuard('jwt'))
+  @Get('verify')
+  @UseGuards(JwtAuthGuard)
   @Roles('alumno')
-  myFunction_a(){
-    return "hola, soy ruta protegida de alumno";
+  verifyAlumno(){ return true; }
+
+
+  /* otra manera
+  @Get('admin')
+  @UseGuards(JwtAuthGuard)
+  @Roles('admin')
+  myFunction_ad(){
+    return "hola, soy ruta protegida de admin";
     
   }
+  */
 
+  /* una manera
   @Get('admin')
   @UseGuards(AuthGuard('jwt'))
   @Roles('admin')
@@ -33,6 +43,7 @@ export class AuthController {
     return "hola, soy ruta protegida de admin";
     
   }
+  */
   /*
   fetch('http://localhost:3000/api/auth/', {
     method: 'GET',
