@@ -18,15 +18,13 @@ import { AlumnoService } from '../alumno/alumno.service';
 import { Organismo } from 'src/organismo/entities/organismo.entity';
 import { Supervisor } from 'src/supervisor/entities/supervisor.entity';
 import { CreateSupervisorDto } from 'src/supervisor/dto/create-supervisor.dto';
+import { Horario } from 'src/horario/entities/horario.entity';
 
 
 class CrearPracticaTotalDto {
   createPracticaDto: CreatePracticaDto;
   createOrganismoDto: CreateOrganismoDto;
   createSupervisor: CreateSupervisorDto
-  descripcion: string;
-  ocasion: string;
-  homologacion: boolean;
   horario: object;
 }
 
@@ -38,6 +36,7 @@ export class PracticaService {
     @InjectRepository(Alumno) private alumnoRepository: Repository<Alumno>,
     @InjectRepository(Evaluacione) private evaluacionesRepository: Repository<Evaluacione>,
     @InjectRepository(Supervisor) private supervisorRepository: Repository<Supervisor>,
+    @InjectRepository(Horario) private horarioRepository: Repository<Horario>,
 
     private alumnoService: AlumnoService,
 
@@ -73,9 +72,6 @@ export class PracticaService {
 
   async crearPractica(mail: string, CrearPracticaTotalDto: CrearPracticaTotalDto) {
     const alumno = await this.alumnoService.obtainAlumnoByMail(mail);
-
-    //now organismo.id exist <-------
-
     /*
     const practicaDto = dto.createPracticaDto;
     const organismoDto = dto.createOrganismoDto;
@@ -95,16 +91,58 @@ export class PracticaService {
 
     /*
     TODO
-    - Inserción de orgnaismo en la bd
-    - Inserción de supervisor en la bd
-    - Inserción de la práctica en la bd
+    - Inserción de orgnaismo en la bd obtener id
+    - Inserción de supervisor en la bd con id de organismo
+    - Inserción de la práctica en la bd con id de organismo y de supervosr 
     - Inserción del horario en la bd, se tiene que hacer por día :c ctm quien modeló esta wea de base de datos mala qla
     */
+
     //Inserción del organismo en la bd
     const organismo = await this.organismoRepository.save(CrearPracticaTotalDto.createOrganismoDto);
-    //Inserción del supervisor en la bd
     const organismoId = organismo.id;
+    //Inserción del supervisor en la bd
     const supervisor = await this.supervisorRepository.save(CrearPracticaTotalDto.createSupervisor);
+    const supervisorId = supervisor.id;
+    //Inserción de la práctica en la bd
+
+    /*
+   const modifiedData = {
+      ...practicaData,
+      additionalData: 'This is some extra data',
+    };
+
+    */
+
+    //obtener horas totales
+   const hrstotales = 0;
+
+    const practica_enrichted = {
+      ...CrearPracticaTotalDto.createPracticaDto,
+      organismoId: organismoId,
+      supervisorId: supervisorId,
+      alumnoId: alumno.id,
+      horasPractica: hrstotales
+    };
+
+    const practica = await this.practicaRepository.save(practica_enrichted);
+    const practicaId = practica.id;
+    //Inserción del horario en la bd, con practicaId ingresar por día
+    //Inserción de días de la semana, este con horario de mañana entrada y salida, luego tarde entrada y salida
+    const Lunes = {...CrearPracticaTotalDto.horario["lunes"], practicaId: practicaId};
+    const Martes = {...CrearPracticaTotalDto.horario["martes"], practicaId: practicaId};
+    const Miercoles = {...CrearPracticaTotalDto.horario["miercoles"], practicaId: practicaId};
+    const Jueves = {...CrearPracticaTotalDto.horario["jueves"], practicaId: practicaId};
+    const Viernes = {...CrearPracticaTotalDto.horario["viernes"], practicaId: practicaId};
+    const lunes = await this.horarioRepository.save(Lunes);
+    const martes = await this.horarioRepository.save(Martes);
+    const miercoles = await this.horarioRepository.save(Miercoles);
+    const jueves = await this.horarioRepository.save(Jueves);
+    const viernes = await this.horarioRepository.save(Viernes);
+    //Ahora obtener total de horas en cada día y sumarlas para obtener el total de horas, total horas lunes, martes, miércoles...
+
+    //Generación de archivo con los datos anteriormente mencionados
+    //Envíar el correo reql con el archivo generado
+
     return 0;
   }
 

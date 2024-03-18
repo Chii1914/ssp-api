@@ -11,9 +11,6 @@ class CrearPracticaTotalDto {
   createPracticaDto: CreatePracticaDto;
   createOrganismoDto: CreateOrganismoDto;
   createSupervisor: CreateSupervisorDto
-  descripcion: string;
-  ocasion: string;
-  homologacion: boolean;
   horario: object;
 }
 
