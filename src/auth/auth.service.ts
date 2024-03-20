@@ -25,22 +25,20 @@ export class AuthService {
 
   async findOrCreateUser(email: string) {
     const admin = await this.usuarioRepository.find({ where: { correo: email } });
-    console.log(admin)
-    if (admin!=null) {
+    if (admin.length > 0) {
       //Si es admin
       return { email: email, rol: "admin" };
     }else{
+      console.log("alumno")
       //Si el loco es alumno
       const alumno = await this.alumnoRepository.findOne({ where: { correoInstitucional: email } });
       if (alumno==null) {
         //Si no existe
-        console.log("alumno no existe")
         const newAlumno = await this.alumnoRepository.create({ correoInstitucional: email });
         await this.alumnoRepository.save(newAlumno);
         return { email: email, rol: "alumno" };        
       }else{
         //Si ya existe
-        console.log("alumno ya existe")
         return { email: email, rol: "alumno" };
       }
     }    

@@ -44,7 +44,7 @@ export class CreateAlumnoDto {
 
     @IsOptional()
     @IsString()
-    ultSemAprobado: string;
+    ultimoSemAprobado: string;
 
     @IsOptional()
     @IsEnum(["Valparaíso", "Santiago"])

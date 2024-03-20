@@ -7,26 +7,24 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsuariosService {
-  constructor(@InjectRepository(Usuario) private usarioRepository: Repository<Usuario>,
+  constructor(@InjectRepository(Usuario) private usuarioRepository: Repository<Usuario>,
   ) { }
 
   create(createUsuarioDto: CreateUsuarioDto) {
     return 'This action adds a new usuario';
   }
 
-  findAll() {
-    return `This action returns all usuario`;
+  obtainSedeByMail(mail: string){
+    console.log(mail)
+    return this.usuarioRepository.find({select: ["sede"], where: {correo :mail}});
   }
+
 
   async findAllSede(sede_i: string) {
     if (sede_i !== "Valparaíso" && sede_i !== "Santiago") {
       throw new Error("Invalid sede value");
     }
-    return await this.usarioRepository.find({ select: ["correo"], where: { sede: sede_i } });
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} usuario`;
+    return await this.usuarioRepository.find({ select: ["correo"], where: { sede: sede_i } });
   }
 
   update(id: number, updateUsuarioDto: UpdateUsuarioDto) {

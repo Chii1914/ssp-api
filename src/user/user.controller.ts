@@ -1,21 +1,33 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete , UseGuards} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { Roles } from 'src/common/roles/roles.decorator';
+
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Get()
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('admin')
+  obtainSedeByMail(mail: string){
+    return this.userService.obtainSedeByMail(mail)
+  }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
 
+  /*
   @Get()
   findAll() {
     return this.userService.findAll();
   }
+  */
 
   @Get(':id')
   findOne(@Param('id') id: string) {
