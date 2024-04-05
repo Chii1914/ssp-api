@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, Res, UseGuards, Request } from '@nestjs/common';
 import { CartasPerService } from './cartas-per.service';
 import { CreateCartasPerDto } from './dto/create-cartas-per.dto';
 import { UpdateCartasPerDto } from './dto/update-cartas-per.dto';
 import { Response } from 'express';
+import { Roles } from 'src/common/roles/roles.decorator';
+import { AuthGuard } from '@nestjs/passport';
 import { FilesService } from 'src/files/files.service';
 import { run } from 'node:test';
 
@@ -10,8 +12,10 @@ import { run } from 'node:test';
 export class CartasPerController {
   constructor(private readonly cartasPerService: CartasPerService, private readonly filesService: FilesService) {}
 
-  @Post(':rut')
-  createByRut(@Param('rut') rut: number, @Body() createCartasGenDto: CreateCartasPerDto) {
+  @Post('crear')
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('alumno')
+  createByRut(@Request() req: any, @Body() createCartasGenDto: CreateCartasPerDto) {
     const {nombreOrganismo, nombreSupervisor, cargoSupervisor, sexoSupervisor, divisionDepartamento, seccionUnidad } = createCartasGenDto;
     return this.cartasPerService.createById(
       nombreOrganismo,
@@ -20,10 +24,11 @@ export class CartasPerController {
       sexoSupervisor,
       divisionDepartamento,
       seccionUnidad,
-      rut,
+      req.user.mail,
       createCartasGenDto
     );
   }
+
 
 
   @Post()

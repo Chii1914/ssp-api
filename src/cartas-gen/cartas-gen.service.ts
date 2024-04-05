@@ -30,8 +30,8 @@ export class CartasGenService {
 
   private readonly directoryPath = path.join(__dirname, '..', '..', 'public', 'documentos');
 
-  async createById(rut: number, createCartasGenDto: CreateCartasGenDto) {
-    const alumno = await this.alumnoService.obtainIdByRut(rut);
+  async createById(mail: string, createCartasGenDto: CreateCartasGenDto) {
+    const alumno = await this.alumnoService.obtainIdByRut(mail);
     const lastCartaGen = await this.CartasGenRepository.createQueryBuilder('carta')
       .innerJoinAndSelect('carta.estudiante', 'alumno')
       .where('carta.estudiante_id = :id', { id: alumno.id })

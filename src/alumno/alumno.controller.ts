@@ -11,24 +11,32 @@ export class AlumnoController {
   constructor(private readonly alumnoService: AlumnoService) { }
 
   //alumno/id/:rut
-  @Get('id/:rut')
-  obtainIdByRut(@Param('rut') rut: number) {
-    return this.alumnoService.obtainIdByRut(rut);
+  @Get('id/')
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('alumno')
+  obtainIdByMail(@Request() req: any) {
+    return this.alumnoService.obtainIdByRut(req.user.mail);
   }
 
-  @Get('ct-gen/:mail')
-  obtainCtGeneralByRut(@Param('mail') mail: string) {
-    return this.alumnoService.obtainCtGeneralByRut(mail);
+  @Get('ct-gen/')
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('alumno')
+  obtainCtGeneralByRut(@Request() req: any) {
+    return this.alumnoService.obtainCtGeneralByRut(req.user.mail);
   }
 
-  @Get('ct-per/:mail')
-  obtainCpGeneralByRut(@Param('mail') mail: string) {
-    return this.alumnoService.obtainCpGeneralByRut(mail);
+  @Get('ct-per/')
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('alumno')
+  obtainCpGeneralByRut(@Request() req: any) {
+    return this.alumnoService.obtainCpGeneralByRut(req.user.mail);
   }
 
-  @Get('rev/:mail')
-  obtainAlumnoByMail(@Param('mail') mail: string) {
-    return this.alumnoService.obtainAlumnoByMail(mail);
+  @Get('rev')
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('alumno')
+  obtainAlumnoByMail(@Request() req: any) {
+    return this.alumnoService.obtainAlumnoByMail(req.user.mail);
   }
   /*
   @Get()

@@ -8,9 +8,9 @@ import { CreateOrganismoDto } from 'src/organismo/dto/create-organismo.dto';
 import { CreateSupervisorDto } from 'src/supervisor/dto/create-supervisor.dto';
 
 class CrearPracticaTotalDto {
-  createPracticaDto: CreatePracticaDto;
-  createOrganismoDto: CreateOrganismoDto;
-  createSupervisor: CreateSupervisorDto
+  createPracticaDto: Object;
+  createOrganismoDto: Object;
+  createSupervisor: Object
   horario: object;
 }
 
@@ -53,6 +53,7 @@ export class PracticaController {
   @UseGuards(AuthGuard('jwt'))
   @Roles('alumno')
   crearPractica(@Request() req: any, @Body() crearPracticaTotalDto: CrearPracticaTotalDto) {
+    console.log(req.user.mail)
     return this.practicaService.crearPractica(req.user.mail, crearPracticaTotalDto);
   }
 

@@ -22,9 +22,9 @@ import { Horario } from 'src/horario/entities/horario.entity';
 
 
 class CrearPracticaTotalDto {
-  createPracticaDto: CreatePracticaDto;
-  createOrganismoDto: CreateOrganismoDto;
-  createSupervisor: CreateSupervisorDto
+  createPracticaDto: Object;
+  createOrganismoDto: Object;
+  createSupervisor: Object
   horario: object;
 }
 
@@ -72,6 +72,8 @@ export class PracticaService {
 
   async crearPractica(mail: string, CrearPracticaTotalDto: CrearPracticaTotalDto) {
     const alumno = await this.alumnoService.obtainAlumnoByMail(mail);
+    console.log(CrearPracticaTotalDto)
+
     /*
     const practicaDto = dto.createPracticaDto;
     const organismoDto = dto.createOrganismoDto;

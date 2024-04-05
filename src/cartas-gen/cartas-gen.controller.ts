@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, NotFoundException, UseGuards, Request } from '@nestjs/common';
 import { CartasGenService } from './cartas-gen.service';
 import { CreateCartasGenDto } from './dto/create-cartas-gen.dto';
 import { UpdateCartasGenDto } from './dto/update-cartas-gen.dto';
 import { Response } from 'express';
+import { AuthGuard } from '@nestjs/passport';
+import { Roles } from 'src/common/roles/roles.decorator';
 import { FilesService } from '../files/files.service';
 import { run } from 'node:test';
 
@@ -10,9 +12,11 @@ import { run } from 'node:test';
 export class CartasGenController {
   constructor(private readonly cartasGenService: CartasGenService, private readonly filesService: FilesService) { }
 
-  @Post(':rut')
-  createByRut(@Param('rut') rut: number, @Body() createCartasGenDto: CreateCartasGenDto) {
-    return this.cartasGenService.createById(rut, createCartasGenDto);
+  @Post('crear')
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('alumno')
+  createByRut(@Request() req: any, @Body() createCartasGenDto: CreateCartasGenDto) {
+    return this.cartasGenService.createById(req.user.mail, createCartasGenDto);
   }
 
   @Post()
@@ -20,6 +24,8 @@ export class CartasGenController {
     return this.cartasGenService.create(createCartasGenDto);
   }
 
+
+  //Admin
   @Get('file/:rut')
   async getFile(@Param('rut') rut: string, @Res() res: Response) {
     const file = this.filesService.getFile(rut + '/' + rut + '-carta_generica.docx');
@@ -36,11 +42,13 @@ export class CartasGenController {
     });
   }
 
+  //Admin
   @Get('snrev/:sede')
   findAllsnRev(@Param('sede') sede: string){
     return this.cartasGenService.findAllsnRev(sede);
   }
 
+  //Admin
   @Get('rev/:sede')
   findAllRev(@Param('sede') sede: string){
     return this.cartasGenService.findAllRev(sede);

@@ -19,8 +19,8 @@ export class AlumnoService {
     private alumnoRepository: Repository<Alumno>,
   ) {}
 
-  async obtainIdByRut(rut: number): Promise <Alumno | undefined> {
-    const alumno = await this.alumnoRepository.findOne({ where: {run: rut}});
+  async obtainIdByRut(mail: string): Promise <Alumno | undefined> {
+    const alumno = await this.alumnoRepository.findOne({ where: {correoInstitucional: mail}});
     return alumno;
   }
 
