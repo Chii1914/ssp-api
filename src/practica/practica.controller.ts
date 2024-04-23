@@ -49,6 +49,11 @@ export class PracticaController {
     return this.practicaService.verifyByMail(req.user.mail);
   }
 
+  @Get('all')
+  getAll(){
+    return this.practicaService.findAll();
+  }
+
   @Post()
   @UseGuards(AuthGuard('jwt'))
   @Roles('alumno')
