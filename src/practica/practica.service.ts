@@ -186,8 +186,6 @@ export class PracticaService {
         "alumno.segundoNombre",
         "alumno.apellidoPaterno",
         "alumno.apellidoMaterno",
-        
-        
       ])
       .where("practica.estado = :estado", { estado: "Rechazada" })
       .andWhere("alumno.sede = :sede", { sede })
