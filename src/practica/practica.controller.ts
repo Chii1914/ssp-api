@@ -41,6 +41,7 @@ $comunaId = trim($this->input->post('comuna'));
 export class PracticaController {
   constructor(private readonly practicaService: PracticaService) { }
 
+  //Acciones de estudiante
   //Verifica si ya realizó una postulación prontamente hacer con front
   @Get()
   @UseGuards(AuthGuard('jwt'))
@@ -49,10 +50,6 @@ export class PracticaController {
     return this.practicaService.verifyByMail(req.user.mail);
   }
 
-  @Get('all')
-  getAll(){
-    return this.practicaService.findAll();
-  }
 
   @Post()
   @UseGuards(AuthGuard('jwt'))
@@ -71,5 +68,21 @@ export class PracticaController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.practicaService.remove(+id);
+  }
+
+  //Acciones de admin
+
+  @Get('sn-rev/:sede') //Prácticas que están sin revisar 
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('admin')
+  getPracticasSinRevisar(@Param('sede') sede: string){
+    return this.practicaService.practicasSinRevisar(sede);
+  }
+
+  @Get('rev-rech/:sede') //Prácticas que están sin revisar 
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('admin')
+  getPracticasRevisadasRechazadas(@Param('sede') sede: string){
+    return this.practicaService.practicasRevisadasRechazadas(sede);
   }
 }

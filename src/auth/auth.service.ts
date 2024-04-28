@@ -12,12 +12,13 @@ export class AuthService {
   @InjectRepository(Alumno) private alumnoRepository: Repository<Alumno>,
   private jwtService: JwtService) { }
 
-  async validateOAuthLogin(thirdPartyId: string, provider: string, email: string, rol: string): Promise<string> {
+  async validateOAuthLogin(thirdPartyId: string, provider: string, email: string, rol: string, sede: string): Promise<string> {
     const payload = {
       sub: thirdPartyId,
       provider,
       email,
-      rol: rol
+      rol: rol,
+      sede: sede || null
     };
     const jwt = this.jwtService.sign(payload);
     return jwt;
@@ -25,9 +26,10 @@ export class AuthService {
 
   async findOrCreateUser(email: string) {
     const admin = await this.usuarioRepository.find({ where: { correo: email } });
+    console.log(admin)
     if (admin.length > 0) {
       //Si es admin
-      return { email: email, rol: "admin" };
+      return { email: email, rol: "admin", sede: admin[0].sede };
     }else{
       console.log("alumno")
       //Si el loco es alumno

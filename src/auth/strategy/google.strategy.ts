@@ -20,7 +20,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     if (!user) {
       return null
     }
-    const jwt = await this.authService.validateOAuthLogin(profile.id, 'google', email, user.rol);
+    const jwt = await this.authService.validateOAuthLogin(profile.id, 'google', email, user.rol, user.sede || null);
     done(null, { jwt });
   }
 }

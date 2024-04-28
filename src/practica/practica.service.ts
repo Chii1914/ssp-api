@@ -152,8 +152,48 @@ export class PracticaService {
     return 'This action adds a new practica';
   }
 
-  async findAll() {
-    return this.practicaRepository.find();
+  async practicasSinRevisar(sede: string) {
+  return await this.practicaRepository.createQueryBuilder("practica")
+    .innerJoinAndSelect("practica.alumno", "alumno")
+    .select([
+      "practica.id",
+      "alumno.run",
+      "alumno.primerNombre",
+      "alumno.segundoNombre",
+      "alumno.apellidoPaterno",
+      "alumno.apellidoMaterno",
+      "practica.fecha_creado",
+      "practica.fecha_cambio_estado",
+      "practica.ocasion",
+      "practica.estado",
+    ]).where("practica.estado = :estado", { estado: "Sin Acción" })
+    .andWhere("alumno.sede = :sede", { sede })
+    .getMany();
+  }
+
+  async practicasRevisadasRechazadas(sede: string) {
+     const practicas = await this.practicaRepository.createQueryBuilder("practica")
+      .innerJoinAndSelect("practica.alumno", "alumno")
+      .select([
+        "practica.id",
+        "practica.fecha_creado",
+        "practica.fecha_cambio_estado",
+        "practica.ocasion",
+        "practica.estado",
+        "alumno.run",
+        "alumno.df",
+        "alumno.primerNombre",
+        "alumno.segundoNombre",
+        "alumno.apellidoPaterno",
+        "alumno.apellidoMaterno",
+        
+        
+      ])
+      .where("practica.estado = :estado", { estado: "Rechazada" })
+      .andWhere("alumno.sede = :sede", { sede })
+      .getMany();
+    
+    return practicas;
   }
 
   update(id: number, updatePracticaDto: UpdatePracticaDto) {
