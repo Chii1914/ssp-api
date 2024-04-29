@@ -156,16 +156,17 @@ export class PracticaService {
   return await this.practicaRepository.createQueryBuilder("practica")
     .innerJoinAndSelect("practica.alumno", "alumno")
     .select([
-      "practica.id",
-      "alumno.run",
-      "alumno.primerNombre",
-      "alumno.segundoNombre",
-      "alumno.apellidoPaterno",
-      "alumno.apellidoMaterno",
-      "practica.fecha_creado",
-      "practica.fecha_cambio_estado",
-      "practica.ocasion",
-      "practica.estado",
+        "practica.id",
+        "practica.fechaCreado",
+        "practica.fechaCambioEstado",
+        "practica.ocasion",
+        "practica.estado",
+        "alumno.run",
+        "alumno.df",
+        "alumno.primerNombre",
+        "alumno.segundoNombre",
+        "alumno.apellidoPaterno",
+        "alumno.apellidoMaterno",
     ]).where("practica.estado = :estado", { estado: "Sin Acción" })
     .andWhere("alumno.sede = :sede", { sede })
     .getMany();
@@ -176,8 +177,8 @@ export class PracticaService {
       .innerJoinAndSelect("practica.alumno", "alumno")
       .select([
         "practica.id",
-        "practica.fecha_creado",
-        "practica.fecha_cambio_estado",
+        "practica.fechaCreado",
+        "practica.fechaCambioEstado",
         "practica.ocasion",
         "practica.estado",
         "alumno.run",
