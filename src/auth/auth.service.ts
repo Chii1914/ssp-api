@@ -25,13 +25,13 @@ export class AuthService {
   }
 
   async findOrCreateUser(email: string) {
+    //is google || is sso -> con google o con google o con duro
     const admin = await this.usuarioRepository.find({ where: { correo: email } });
     console.log(admin)
     if (admin.length > 0) {
       //Si es admin
       return { email: email, rol: "admin", sede: admin[0].sede };
     }else{
-      console.log("alumno")
       //Si el loco es alumno
       const alumno = await this.alumnoRepository.findOne({ where: { correoInstitucional: email } });
       if (alumno==null) {
@@ -41,7 +41,7 @@ export class AuthService {
         return { email: email, rol: "alumno" };        
       }else{
         //Si ya existe
-        return { email: email, rol: "alumno" };
+        return { email: email, rol: "alumno", sede: alumno.sede || null };
       }
     }    
   }
