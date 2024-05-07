@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 import { Alumno } from '../alumno/entities/alumno.entity';
 import { Usuario } from '../usuarios/entities/usuario.entity';
+import Mail from 'nodemailer/lib/mailer';
 @Injectable()
 export class AuthService {
   constructor(
@@ -25,9 +26,11 @@ export class AuthService {
   }
 
   async findOrCreateUser(email: string) {
-    //is google || is sso -> con google o con google o con duro
+    //is google || is sso -> con google o con google o con duro  
+    if(!(/@alumnos\.uv\.cl$/.test(email))){
+      return 0;
+    }
     const admin = await this.usuarioRepository.find({ where: { correo: email } });
-    console.log(admin)
     if (admin.length > 0) {
       //Si es admin
       return { email: email, rol: "admin", sede: admin[0].sede };
