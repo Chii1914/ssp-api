@@ -2,6 +2,7 @@
 Solo el flaco inri sabe lo que ocurre acá, está entero peludo este código ql, lleno de datos inecesarios
 y demostrando lo mal planteada que fue la base de datos
 conxemimare, Dios te guíe si llegaste viendo el código de este archivo buscand respuestas
+Horas perdidas aquí: 23
 */
 
 
@@ -25,7 +26,7 @@ class CrearPracticaTotalDto {
   createPracticaDto: Object;
   createOrganismoDto: Object;
   createSupervisor: Object
-  horario: object;
+  horario: Object;
 }
 
 @Injectable()
@@ -70,27 +71,9 @@ export class PracticaService {
     return true;
   }
 
-  async crearPractica(mail: string, CrearPracticaTotalDto: CrearPracticaTotalDto) {
+  async crearPractica(mail: string, data: Object) {
     const alumno = await this.alumnoService.obtainAlumnoByMail(mail);
-    console.log(CrearPracticaTotalDto)
-
-    /*
-    const practicaDto = dto.createPracticaDto;
-    const organismoDto = dto.createOrganismoDto;
-    const horarioDto = dto.createHorarioDto;
-    const descripcion = dto.descripcion;
-    const homologacion = dto.homologacion;
-    */
-    /* ESTUDIANTE
-    $estudiante = $this->Estudiante_Model->get_estudiante($this->session->userdata('id'));
-    $practica = $this->input->post('ocasion_practica');
-    $practica_homologacion = $this->input->post('practica_homologacion');
-    $practica_homologacion = ($practica_homologacion != NULL) ? $practica_homologacion : "0";
-    $sexo = $this->input->post('sexo');
-    $ultimo_sem_aprobado = $this->input->post('ultimo_sem_aprobado');
-    $this->load->model('practicas/Estudiante_Model')
-    */
-
+   
     /*
     TODO
     - Inserción de orgnaismo en la bd obtener id
@@ -98,53 +81,31 @@ export class PracticaService {
     - Inserción de la práctica en la bd con id de organismo y de supervosr 
     - Inserción del horario en la bd, se tiene que hacer por día :c ctm quien modeló esta wea de base de datos mala qla
     */
+    const organismoData = data["createOrganismo"];
+    const supervisorData = data["createSupervisor"];
+    const horarioData = data["horario"];
+    let practicaData = data["practica"];
 
-    //Inserción del organismo en la bd
-    const organismo = await this.organismoRepository.save(CrearPracticaTotalDto.createOrganismoDto);
-    const organismoId = organismo.id;
-    //Inserción del supervisor en la bd
-    const supervisor = await this.supervisorRepository.save(CrearPracticaTotalDto.createSupervisor);
-    const supervisorId = supervisor.id;
-    //Inserción de la práctica en la bd
-
-    /*
-   const modifiedData = {
-      ...practicaData,
-      additionalData: 'This is some extra data',
-    };
-
-    */
-
-    //obtener horas totales
-   const hrstotales = 0;
-
-    const practica_enrichted = {
-      ...CrearPracticaTotalDto.createPracticaDto,
-      organismoId: organismoId,
-      supervisorId: supervisorId,
-      alumnoId: alumno.id,
-      horasPractica: hrstotales
-    };
-
-    const practica = await this.practicaRepository.save(practica_enrichted);
-    const practicaId = practica.id;
-    //Inserción del horario en la bd, con practicaId ingresar por día
-    //Inserción de días de la semana, este con horario de mañana entrada y salida, luego tarde entrada y salida
-    const Lunes = {...CrearPracticaTotalDto.horario["lunes"], practicaId: practicaId};
-    const Martes = {...CrearPracticaTotalDto.horario["martes"], practicaId: practicaId};
-    const Miercoles = {...CrearPracticaTotalDto.horario["miercoles"], practicaId: practicaId};
-    const Jueves = {...CrearPracticaTotalDto.horario["jueves"], practicaId: practicaId};
-    const Viernes = {...CrearPracticaTotalDto.horario["viernes"], practicaId: practicaId};
-    const lunes = await this.horarioRepository.save(Lunes);
-    const martes = await this.horarioRepository.save(Martes);
-    const miercoles = await this.horarioRepository.save(Miercoles);
-    const jueves = await this.horarioRepository.save(Jueves);
-    const viernes = await this.horarioRepository.save(Viernes);
-    //Ahora obtener total de horas en cada día y sumarlas para obtener el total de horas, total horas lunes, martes, miércoles...
-
-    //Generación de archivo con los datos anteriormente mencionados
-    //Envíar el correo reql con el archivo generado
-
+    let organismoId;
+    let supervisorId;
+    try{
+      const organismo = await this.organismoRepository.save(organismoData);
+      organismoId = organismo.id;
+      const supervisor = await this.supervisorRepository.save(supervisorData);
+      supervisorId = supervisor.id;
+    }catch(err){
+      return "Error en la inserción de los datos a la bd";
+    }
+    practicaData = {...practicaData, organismoId: organismoId, supervisorId: supervisorId, alumnoId: alumno.id, horasPractica: horarioData.totalHoras};
+    try{
+      const practica = await this.practicaRepository.save(practicaData);
+      console.log(practica.id)
+    }catch(err){
+      console.log(err)
+      return "Error en la inserción de los datos a la bd";
+    }
+    //Ahora insertar el horario reql, generar el documento y enviar por correo a todos
+    
     return 0;
   }
 

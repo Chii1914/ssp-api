@@ -7,12 +7,7 @@ import { Roles } from 'src/common/roles/roles.decorator';
 import { CreateOrganismoDto } from 'src/organismo/dto/create-organismo.dto';
 import { CreateSupervisorDto } from 'src/supervisor/dto/create-supervisor.dto';
 
-class CrearPracticaTotalDto {
-  createPracticaDto: Object;
-  createOrganismoDto: Object;
-  createSupervisor: Object
-  horario: object;
-}
+
 
 /* ESTUDIANTE
 $this->load->model('practicas/Estudiante_Model');
@@ -50,15 +45,13 @@ export class PracticaController {
     return this.practicaService.verifyByMail(req.user.mail);
   }
 
-
   @Post()
   @UseGuards(AuthGuard('jwt'))
   @Roles('alumno')
-  crearPractica(@Request() req: any, @Body() crearPracticaTotalDto: CrearPracticaTotalDto) {
+  crearPractica(@Request() req: any, @Body() crearPracticaTotal: Object) {
     console.log(req.user.mail)
-    return this.practicaService.crearPractica(req.user.mail, crearPracticaTotalDto);
+    return this.practicaService.crearPractica(req.user.mail, crearPracticaTotal);
   }
-
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePracticaDto: UpdatePracticaDto) {
@@ -75,14 +68,14 @@ export class PracticaController {
   @Get('sn-rev/:sede') //Prácticas que están sin revisar 
   @UseGuards(AuthGuard('jwt'))
   @Roles('admin')
-  getPracticasSinRevisar(@Param('sede') sede: string){
+  getPracticasSinRevisar(@Param('sede') sede: string) {
     return this.practicaService.practicasSinRevisar(sede);
   }
 
   @Get('rev-rech/:sede') //Prácticas que están sin revisar 
   @UseGuards(AuthGuard('jwt'))
   @Roles('admin')
-  getPracticasRevisadasRechazadas(@Param('sede') sede: string){
+  getPracticasRevisadasRechazadas(@Param('sede') sede: string) {
     return this.practicaService.practicasRevisadasRechazadas(sede);
   }
 }

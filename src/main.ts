@@ -5,8 +5,12 @@ import * as cors from 'cors'; // Importa el paquete 'cors'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.use(cors());
-  app.setGlobalPrefix("api/");
+  app.use(cors({
+    origin: 'http://localhost:3001',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Accept, Authorization', // Include Authorization
+    credentials: true,
+  }));  app.setGlobalPrefix("api/");
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,              //Usuario envía cosas que no corresponda
