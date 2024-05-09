@@ -4,8 +4,8 @@ y demostrando lo mal planteada que fue la base de datos
 conxemimare, Dios te guíe si llegaste viendo el código de este archivo buscand respuestas
 Horas perdidas aquí: 24
 */
-
-
+import * as path from 'path';
+import { Usuario } from 'src/usuarios/entities/usuario.entity';
 import { Injectable } from '@nestjs/common';
 import { CreatePracticaDto } from './dto/create-practica.dto';
 import { CreateOrganismoDto } from 'src/organismo/dto/create-organismo.dto';
@@ -21,15 +21,8 @@ import { Supervisor } from 'src/supervisor/entities/supervisor.entity';
 import { CreateSupervisorDto } from 'src/supervisor/dto/create-supervisor.dto';
 import { Horario } from 'src/horario/entities/horario.entity';
 import { DockGeneratorService } from 'src/dock_generator/dock_generator.service';
-
-
-
-class CrearPracticaTotalDto {
-  createPracticaDto: Object;
-  createOrganismoDto: Object;
-  createSupervisor: Object
-  horario: Object;
-}
+import { MailerService } from '../mailer/mailer.service';
+import { UsuariosService } from '../usuarios/usuarios.service';
 
 @Injectable()
 export class PracticaService {
@@ -40,8 +33,12 @@ export class PracticaService {
     @InjectRepository(Evaluacione) private evaluacionesRepository: Repository<Evaluacione>,
     @InjectRepository(Supervisor) private supervisorRepository: Repository<Supervisor>,
     @InjectRepository(Horario) private horarioRepository: Repository<Horario>,
+    @InjectRepository(Usuario) private usuarioRepository: Repository<Usuario>,
     private dockGeneratorService: DockGeneratorService,
     private alumnoService: AlumnoService,
+    private mailerService: MailerService,
+    private usuarioService: UsuariosService,
+
 
   ) { }
 
@@ -216,15 +213,28 @@ export class PracticaService {
     //Actualizar nombre de archivo, en la base de datos con practicaId
     //Actualizar semestre del alumno
     //Generación de documento lista, ahora falta enviar el correo con el documento adjunto
-    try{
+    try {
       const practica = await this.practicaRepository.update(practicaId, { nombreArchivo: nombre_archivo });
       const semestre = await this.alumnoRepository.update(alumno.id, { ultimoSemAprobado: alumno.ultimoSemAprobado });
-    }catch(err){
+    } catch (err) {
       console.log(err)
       return "Error en la inserción de los datos a la bd";
     }
+    const correos = await this.usuarioService.findAllSede(alumno.sede);
+    const correosStr = correos.map(usuario => usuario.correo).join(', ');
     
-    console.log(nombre_archivo)
+    const filepath = path.join(__dirname, "..", "..", "public", "documentos", alumno.run.toString() , nombre_archivo);
+
+    await this.mailerService.sendMail(
+      alumno.correoInstitucional,
+      'Generación práctica',
+      'Se ha generado su práctica, adjunta a este correo se encuentra el archivo correspondiente.',
+      '',
+      correosStr,
+      nombre_archivo,
+      filepath
+    );
+
     return 0;
   }
 
