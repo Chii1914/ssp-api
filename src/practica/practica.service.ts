@@ -2,7 +2,7 @@
 Solo el flaco inri sabe lo que ocurre acá, está entero peludo este código ql, lleno de datos inecesarios
 y demostrando lo mal planteada que fue la base de datos
 conxemimare, Dios te guíe si llegaste viendo el código de este archivo buscand respuestas
-Horas perdidas aquí: 23
+Horas perdidas aquí: 24
 */
 
 
@@ -20,6 +20,8 @@ import { Organismo } from 'src/organismo/entities/organismo.entity';
 import { Supervisor } from 'src/supervisor/entities/supervisor.entity';
 import { CreateSupervisorDto } from 'src/supervisor/dto/create-supervisor.dto';
 import { Horario } from 'src/horario/entities/horario.entity';
+import { DockGeneratorService } from 'src/dock_generator/dock_generator.service';
+
 
 
 class CrearPracticaTotalDto {
@@ -38,7 +40,7 @@ export class PracticaService {
     @InjectRepository(Evaluacione) private evaluacionesRepository: Repository<Evaluacione>,
     @InjectRepository(Supervisor) private supervisorRepository: Repository<Supervisor>,
     @InjectRepository(Horario) private horarioRepository: Repository<Horario>,
-
+    private dockGeneratorService: DockGeneratorService,
     private alumnoService: AlumnoService,
 
   ) { }
@@ -73,7 +75,7 @@ export class PracticaService {
 
   async crearPractica(mail: string, data: Object) {
     const alumno = await this.alumnoService.obtainAlumnoByMail(mail);
-   
+
     /*
     TODO
     - Inserción de orgnaismo en la bd obtener id
@@ -88,24 +90,141 @@ export class PracticaService {
 
     let organismoId;
     let supervisorId;
-    try{
+    let practicaId;
+    try {
       const organismo = await this.organismoRepository.save(organismoData);
       organismoId = organismo.id;
       const supervisor = await this.supervisorRepository.save(supervisorData);
       supervisorId = supervisor.id;
-    }catch(err){
+    } catch (err) {
       return "Error en la inserción de los datos a la bd";
     }
-    practicaData = {...practicaData, organismoId: organismoId, supervisorId: supervisorId, alumnoId: alumno.id, horasPractica: horarioData.totalHoras};
-    try{
+    practicaData = { ...practicaData, organismoId: organismoId, supervisorId: supervisorId, alumnoId: alumno.id, horasPractica: horarioData.totalHoras };
+    try {
       const practica = await this.practicaRepository.save(practicaData);
-      console.log(practica.id)
+      practicaId = practica.id;
+    } catch (err) {
+      console.log(err)
+      return "Error en la inserción de los datos a la bd";
+    }
+    try {
+      const horarioLunes = await this.horarioRepository.save({
+        practicaId: practicaId,
+        dia: "Lunes",
+        horaMananaEntrada: horarioData.horaLunesMananaEntrada,
+        horaMananaSalida: horarioData.horaLunesMananaSalida,
+        horaTardeEntrada: horarioData.horaLunesTardeEntrada,
+        horaTardeSalida: horarioData.horaLunesTardeSalida,
+      });
+      const horarioMartes = await this.horarioRepository.save({
+        practicaId: practicaId,
+        dia: "Martes",
+        horaMananaEntrada: horarioData.horaMartesMananaEntrada,
+        horaMananaSalida: horarioData.horaMartesMananaSalida,
+        horaTardeEntrada: horarioData.horaMartesTardeEntrada,
+        horaTardeSalida: horarioData.horaMartesTardeSalida,
+      });
+      const horarioMiercoles = await this.horarioRepository.save({
+        practicaId: practicaId,
+        dia: "Miercoles",
+        horaMananaEntrada: horarioData.horaMiercolesMananaEntrada,
+        horaMananaSalida: horarioData.horaMiercolesMananaSalida,
+        horaTardeEntrada: horarioData.horaMiercolesTardeEntrada,
+        horaTardeSalida: horarioData.horaMiercolesTardeSalida,
+      });
+      const horarioJueves = await this.horarioRepository.save({
+        practicaId: practicaId,
+        dia: "Jueves",
+        horaMananaEntrada: horarioData.horaJuevesMananaEntrada,
+        horaMananaSalida: horarioData.horaJuevesMananaSalida,
+        horaTardeEntrada: horarioData.horaJuevesTardeEntrada,
+        horaTardeSalida: horarioData.horaJuevesTardeSalida,
+      });
+      const horarioViernes = await this.horarioRepository.save({
+        practicaId: practicaId,
+        dia: "Viernes",
+        horaMananaEntrada: horarioData.horaViernesMananaEntrada,
+        horaMananaSalida: horarioData.horaViernesMananaSalida,
+        horaTardeEntrada: horarioData.horaViernesTardeEntrada,
+        horaTardeSalida: horarioData.horaViernesTardeSalida,
+      });
+    } catch (err) {
+      console.log(err)
+      return "Error en la inserción de los datos a la bd";
+    }
+    let homologacion;
+    homologacion = practicaData['homologacion'] ? "Si" : "No";
+    let nombre_archivo;
+
+    nombre_archivo = await this.dockGeneratorService.crear_postulacion({
+      dia: new Date().getDate(),
+      mes: new Date().getMonth(),
+      anio: new Date().getFullYear(),
+      primer_nombre: alumno.primerNombre,
+      segundo_nombre: alumno.segundoNombre,
+      apellido_paterno: alumno.apellidoPaterno,
+      apellido_materno: alumno.apellidoMaterno,
+      run: alumno.run,
+      df: alumno.df,
+      telefono: alumno.telefono,
+      correo_institucional: alumno.correoInstitucional,
+      correo_personal: alumno.correoPersonal,
+      sede: alumno.sede,
+      practica: practicaData['ocacion'],
+      anio_ingreso: alumno.anioIngreso,
+      ultimo_sem_aprobado: alumno.ultimoSemAprobado,
+      homologacion: homologacion,
+      nombre_organismo: organismoData['nombreOrganismo'],
+      direccion_organismo: organismoData['direccion'],
+      division_departamento: organismoData['divisionDepartamento'],
+      seccion_unidad: organismoData['seccionUnidad'],
+      nombre_supervisor: supervisorData['nombre'],
+      cargo_supervisor: supervisorData['cargo'],
+      correo_supervisor: supervisorData['correo'],
+      fecha_inicio: practicaData['fechaInicio'],
+      fecha_termino: practicaData['fechaTermino'],
+      hora_lunes_manana_entrada: horarioData['horaLunesMananaEntrada'],
+      hora_lunes_manana_salida: horarioData['horaLunesMananaSalida'],
+      hora_lunes_tarde_entrada: horarioData['horaLunesTardeEntrada'],
+      hora_lunes_tarde_salida: horarioData['horaLunesTardeSalida'],
+      total_horas_lunes: horarioData['totalHorasLunes'],
+      hora_martes_manana_entrada: horarioData['horaMartesMananaEntrada'],
+      hora_martes_manana_salida: horarioData['horaMartesMananaSalida'],
+      hora_martes_tarde_entrada: horarioData['horaMartesTardeEntrada'],
+      hora_martes_tarde_salida: horarioData['horaMartesTardeSalida'],
+      total_horas_martes: horarioData['totalHorasMartes'],
+      hora_miercoles_manana_entrada: horarioData['horaMiercolesMananaEntrada'],
+      hora_miercoles_manana_salida: horarioData['horaMiercolesMananaSalida'],
+      hora_miercoles_tarde_entrada: horarioData['horaMiercolesTardeEntrada'],
+      hora_miercoles_tarde_salida: horarioData['horaMiercolesTardeSalida'],
+      total_horas_miercoles: horarioData['totalHorasMiercoles'],
+      hora_jueves_manana_entrada: horarioData['horaJuevesMananaEntrada'],
+      hora_jueves_manana_salida: horarioData['horaJuevesMananaSalida'],
+      hora_jueves_tarde_entrada: horarioData['horaJuevesTardeEntrada'],
+      hora_jueves_tarde_salida: horarioData['horaJuevesTardeSalida'],
+      total_horas_jueves: horarioData['totalHorasJueves'],
+      hora_viernes_manana_entrada: horarioData['horaViernesMananaEntrada'],
+      hora_viernes_manana_salida: horarioData['horaViernesMananaSalida'],
+      hora_viernes_tarde_entrada: horarioData['horaViernesTardeEntrada'],
+      hora_viernes_tarde_salida: horarioData['horaViernesTardeSalida'],
+      total_horas_viernes: horarioData['totalHorasViernes'],
+      total_horas_semanales: horarioData['totalHoras'],
+      descripcion: practicaData['descripcion'].replace(/\r\n/g, "</w:t><w:br/><w:t>"),
+      piepagina: practicaData['piepagina'],
+      nombre_archivo: alumno.run + '-postulacion(Primera).docx',
+    });
+    //Actualizar nombre de archivo, en la base de datos con practicaId
+    //Actualizar semestre del alumno
+    //Generación de documento lista, ahora falta enviar el correo con el documento adjunto
+    try{
+      const practica = await this.practicaRepository.update(practicaId, { nombreArchivo: nombre_archivo });
+      const semestre = await this.alumnoRepository.update(alumno.id, { ultimoSemAprobado: alumno.ultimoSemAprobado });
     }catch(err){
       console.log(err)
       return "Error en la inserción de los datos a la bd";
     }
-    //Ahora insertar el horario reql, generar el documento y enviar por correo a todos
     
+    console.log(nombre_archivo)
     return 0;
   }
 
@@ -114,9 +233,9 @@ export class PracticaService {
   }
 
   async practicasSinRevisar(sede: string) {
-  return await this.practicaRepository.createQueryBuilder("practica")
-    .innerJoinAndSelect("practica.alumno", "alumno")
-    .select([
+    return await this.practicaRepository.createQueryBuilder("practica")
+      .innerJoinAndSelect("practica.alumno", "alumno")
+      .select([
         "practica.id",
         "practica.fechaCreado",
         "practica.fechaCambioEstado",
@@ -128,13 +247,13 @@ export class PracticaService {
         "alumno.segundoNombre",
         "alumno.apellidoPaterno",
         "alumno.apellidoMaterno",
-    ]).where("practica.estado = :estado", { estado: "Sin Acción" })
-    .andWhere("alumno.sede = :sede", { sede })
-    .getMany();
+      ]).where("practica.estado = :estado", { estado: "Sin Acción" })
+      .andWhere("alumno.sede = :sede", { sede })
+      .getMany();
   }
 
   async practicasRevisadasRechazadas(sede: string) {
-     const practicas = await this.practicaRepository.createQueryBuilder("practica")
+    const practicas = await this.practicaRepository.createQueryBuilder("practica")
       .innerJoinAndSelect("practica.alumno", "alumno")
       .select([
         "practica.id",
@@ -152,7 +271,7 @@ export class PracticaService {
       .where("practica.estado = :estado", { estado: "Rechazada" })
       .andWhere("alumno.sede = :sede", { sede })
       .getMany();
-    
+
     return practicas;
   }
 
