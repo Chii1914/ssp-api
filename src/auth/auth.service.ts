@@ -27,7 +27,7 @@ export class AuthService {
 
   async findOrCreateUser(email: string) {
     //is google || is sso -> con google o con google o con duro  
-    if(!(/@alumnos\.uv\.cl$/.test(email))){
+    if(!(/@alumnos\.uv\.cl$/.test(email)) || !(/@uv\.cl$/.test(email))){
       return 0;
     }
     const admin = await this.usuarioRepository.find({ where: { correo: email } });
