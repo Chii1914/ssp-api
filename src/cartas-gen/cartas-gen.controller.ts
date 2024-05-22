@@ -15,12 +15,12 @@ export class CartasGenController {
   @Post('crear')
   @UseGuards(AuthGuard('jwt'))
   @Roles('alumno')
-  createByRut(@Request() req: any, @Body() createCartasGenDto: CreateCartasGenDto) {
-    return this.cartasGenService.createById(req.user.mail, createCartasGenDto);
+  createByRut(@Request() req: any, @Body() semestre: Object) {
+    return this.cartasGenService.createById(req.user.mail, semestre);
   }
 
   @Post()
-  create(@Body() createCartasGenDto: CreateCartasGenDto) {
+  create(@Body() createCartasGenDto: CreateCartasGenDto, ) {
     return this.cartasGenService.create(createCartasGenDto);
   }
 
@@ -29,11 +29,9 @@ export class CartasGenController {
   @Get('file/:rut')
   async getFile(@Param('rut') rut: string, @Res() res: Response) {
     const file = this.filesService.getFile(rut + '/' + rut + '-carta_generica.docx');
-
     if (!file) {
       throw new NotFoundException('File not found');
     }
-
     res.download(file.path, rut + '-carta_generica', (err) => {
       if (err) {
         // Log error internally; don't expose details to the client

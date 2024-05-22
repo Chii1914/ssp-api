@@ -75,10 +75,8 @@ export class PracticaService {
 
     /*
     TODO
-    - Inserción de orgnaismo en la bd obtener id
-    - Inserción de supervisor en la bd con id de organismo
-    - Inserción de la práctica en la bd con id de organismo y de supervosr 
-    - Inserción del horario en la bd, se tiene que hacer por día :c ctm quien modeló esta wea de base de datos mala qla
+      - Cambio de semestre con modal
+      - Pié de página
     */
     const organismoData = data["createOrganismo"];
     const supervisorData = data["createSupervisor"];
@@ -212,7 +210,6 @@ export class PracticaService {
     });
     //Actualizar nombre de archivo, en la base de datos con practicaId
     //Actualizar semestre del alumno
-    //Generación de documento lista, ahora falta enviar el correo con el documento adjunto
     try {
       const practica = await this.practicaRepository.update(practicaId, { nombreArchivo: nombre_archivo });
       const semestre = await this.alumnoRepository.update(alumno.id, { ultimoSemAprobado: alumno.ultimoSemAprobado });
@@ -222,9 +219,8 @@ export class PracticaService {
     }
     const correos = await this.usuarioService.findAllSede(alumno.sede);
     const correosStr = correos.map(usuario => usuario.correo).join(', ');
-    
+    console.log(nombre_archivo)
     const filepath = path.join(__dirname, "..", "..", "public", "documentos", alumno.run.toString() , nombre_archivo);
-
     await this.mailerService.sendMail(
       alumno.correoInstitucional,
       'Generación práctica',
