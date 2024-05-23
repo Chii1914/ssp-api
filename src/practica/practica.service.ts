@@ -63,11 +63,23 @@ export class PracticaService {
       .andWhere("practica.estado = :estado", { estado: "Aceptada" })
       .andWhere("evaluaciones.evaluacion = :evaluacion", { evaluacion: "Aprobada" })
       .getCount();
-    console.log(count_snevaluar, count_snaccion, count_evaluadas)
     if (count_snevaluar > 0 || count_evaluadas > 0 || count_snaccion > 0) {
-      return false;
-    }
-    return true;
+      return {
+        status: false,
+        contadores: {
+          sin_evaluar: count_snevaluar,
+          evaluadas: count_evaluadas,
+          sin_accion: count_snaccion
+        }
+      }    }
+    return {
+      status: true,
+      contadores: {
+        sin_evaluar: count_snevaluar,
+        evaluadas: count_evaluadas,
+        sin_accion: count_snaccion
+      }
+    };
   }
 
   async crearPractica(mail: string, data: Object) {
@@ -81,6 +93,7 @@ export class PracticaService {
     const organismoData = data["createOrganismo"];
     const supervisorData = data["createSupervisor"];
     const horarioData = data["horario"];
+    const UltSem = data["semestre"];
     let practicaData = data["practica"];
 
     let organismoId;
@@ -208,18 +221,15 @@ export class PracticaService {
       piepagina: practicaData['piepagina'],
       nombre_archivo: alumno.run + '-postulacion(Primera).docx',
     });
-    //Actualizar nombre de archivo, en la base de datos con practicaId
-    //Actualizar semestre del alumno
     try {
       const practica = await this.practicaRepository.update(practicaId, { nombreArchivo: nombre_archivo });
-      const semestre = await this.alumnoRepository.update(alumno.id, { ultimoSemAprobado: alumno.ultimoSemAprobado });
+      const semestre = await this.alumnoRepository.update(alumno.id, { ultimoSemAprobado: UltSem.ultimoSemAprobado });
     } catch (err) {
       console.log(err)
       return "Error en la inserción de los datos a la bd";
     }
     const correos = await this.usuarioService.findAllSede(alumno.sede);
     const correosStr = correos.map(usuario => usuario.correo).join(', ');
-    console.log(nombre_archivo)
     const filepath = path.join(__dirname, "..", "..", "public", "documentos", alumno.run.toString() , nombre_archivo);
     await this.mailerService.sendMail(
       alumno.correoInstitucional,
