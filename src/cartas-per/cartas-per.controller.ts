@@ -16,7 +16,7 @@ export class CartasPerController {
   @UseGuards(AuthGuard('jwt'))
   @Roles('alumno')
   createByRut(@Request() req: any, @Body() createCartasGenDto: CreateCartasPerDto) {
-    const {nombreOrganismo, nombreSupervisor, cargoSupervisor, sexoSupervisor, divisionDepartamento, seccionUnidad } = createCartasGenDto;
+    const {nombreOrganismo, nombreSupervisor, cargoSupervisor, sexoSupervisor, divisionDepartamento, seccionUnidad, ultimoSemAprobado } = createCartasGenDto;
     return this.cartasPerService.createById(
       nombreOrganismo,
       nombreSupervisor,
@@ -25,7 +25,7 @@ export class CartasPerController {
       divisionDepartamento,
       seccionUnidad,
       req.user.mail,
-      createCartasGenDto
+      ultimoSemAprobado,
     );
   }
 

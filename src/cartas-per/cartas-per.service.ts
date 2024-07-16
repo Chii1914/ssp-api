@@ -33,7 +33,7 @@ export class CartasPerService {
   create(createCartasPerDto: CreateCartasPerDto) {
     return 'This action adds a new cartasPer';
   }
-  async createById(nombreOrganismo: string, nombreSupervisor: string, cargoSupervisor:string, sexoSupervisor, divisionDepartamento:string, seccionUnidad:string,mail:string, createCartasPerDto: CreateCartasPerDto) {
+  async createById(nombreOrganismo: string, nombreSupervisor: string, cargoSupervisor:string, sexoSupervisor, divisionDepartamento:string, seccionUnidad:string,mail:string, ultimoSemAprobado: string) {
     let extracto1_supervisor = "";
     let extracto2_supervisor = "";
     if (sexoSupervisor == "Masculino") {
@@ -43,7 +43,18 @@ export class CartasPerService {
       extracto1_supervisor = "Señora";
       extracto2_supervisor = "Estimada Señora";
     }
-    const alumno = await this.alumnoService.obtainAlumnoByMail(mail);
+    let alumno = await this.alumnoService.obtainAlumnoByMail(mail);
+    try{
+      await this.alumnoRepository.update(alumno.id, {ultimoSemAprobado: ultimoSemAprobado});
+      alumno = await this.alumnoService.obtainAlumnoByMail(mail);
+
+    }catch(e){
+      console.log("error en la actualización de semestre aprobado")
+      console.log(e);
+    }
+    
+    console.log(alumno)
+
     const lastCartaPer = await this.CartasPerRepository.createQueryBuilder('carta')
       .innerJoinAndSelect('carta.estudiante', 'alumno')
       .where('carta.estudiante_id = :id', { id: alumno.id })

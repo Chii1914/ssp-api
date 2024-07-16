@@ -24,6 +24,9 @@ export class CreateCartasPerDto {
     @IsString()
     readonly seccionUnidad: string;
 
+    @IsString()
+    readonly ultimoSemAprobado: string;
+
     @IsOptional()
     @IsBoolean()
     readonly revisado: boolean;

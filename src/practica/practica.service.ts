@@ -87,13 +87,12 @@ export class PracticaService {
 
     /*
     TODO
-      - Cambio de semestre con modal
       - Pié de página
     */
     const organismoData = data["createOrganismo"];
     const supervisorData = data["createSupervisor"];
     const horarioData = data["horario"];
-    const UltSem = data["semestre"];
+    const ultimoSemestre = data["semestre"].UltSem;
     let practicaData = data["practica"];
 
     let organismoId;
@@ -105,15 +104,16 @@ export class PracticaService {
       const supervisor = await this.supervisorRepository.save(supervisorData);
       supervisorId = supervisor.id;
     } catch (err) {
-      return "Error en la inserción de los datos a la bd";
+      console.log(err)
+      return "Error en la inserción de los datos a la bd en organismo";
     }
-    practicaData = { ...practicaData, organismoId: organismoId, supervisorId: supervisorId, alumnoId: alumno.id, horasPractica: horarioData.totalHoras };
+    practicaData = { ...practicaData, organismoId: organismoId, supervisorId: supervisorId, alumnoId: alumno.id, horasPractica: horarioData.totalHoras, fechaInicio: practicaData.fechaInicio, fechaTermino: practicaData.fechaTermino};
     try {
       const practica = await this.practicaRepository.save(practicaData);
       practicaId = practica.id;
     } catch (err) {
       console.log(err)
-      return "Error en la inserción de los datos a la bd";
+      return "Error en la inserción de los datos a la bd aquí en práctica";
     }
     try {
       const horarioLunes = await this.horarioRepository.save({
@@ -158,7 +158,7 @@ export class PracticaService {
       });
     } catch (err) {
       console.log(err)
-      return "Error en la inserción de los datos a la bd";
+      return "Error en la inserción de los datos a la bd en horario";
     }
     let homologacion;
     homologacion = practicaData['homologacion'] ? "Si" : "No";
@@ -223,10 +223,10 @@ export class PracticaService {
     });
     try {
       const practica = await this.practicaRepository.update(practicaId, { nombreArchivo: nombre_archivo });
-      const semestre = await this.alumnoRepository.update(alumno.id, { ultimoSemAprobado: UltSem.ultimoSemAprobado });
+      const semestre = await this.alumnoRepository.update(alumno.id, { ultimoSemAprobado: ultimoSemestre});
     } catch (err) {
       console.log(err)
-      return "Error en la inserción de los datos a la bd";
+      return "Error en la inserción de los datos a la bd respecto a semestre";
     }
     const correos = await this.usuarioService.findAllSede(alumno.sede);
     const correosStr = correos.map(usuario => usuario.correo).join(', ');
@@ -241,7 +241,7 @@ export class PracticaService {
       filepath
     );
 
-    return 0;
+    return "Práctica generada o actualizada exitosamente";
   }
 
   create(createPracticaDto: CreatePracticaDto) {
