@@ -53,8 +53,6 @@ export class CartasPerService {
       console.log(e);
     }
     
-    console.log(alumno)
-
     const lastCartaPer = await this.CartasPerRepository.createQueryBuilder('carta')
       .innerJoinAndSelect('carta.estudiante', 'alumno')
       .where('carta.estudiante_id = :id', { id: alumno.id })
