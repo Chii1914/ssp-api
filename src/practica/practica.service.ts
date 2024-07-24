@@ -42,43 +42,71 @@ export class PracticaService {
 
   ) { }
 
-  async verifyByMail(mail: string) {
+  async verifyByMail(mail: string, ocacion: string) {
     const alumno = await this.alumnoService.obtainAlumnoByMail(mail);
     const count_snevaluar = await this.practicaRepository.createQueryBuilder("practica")
       .where("practica.alumnoId = :id", { id: alumno.id })
-      .andWhere("practica.ocasion = :ocasion", { ocasion: "Primera" })
+      .andWhere("practica.ocasion = :ocasion", { ocasion: ocacion })
       .andWhere("practica.estado = :estado", { estado: "Aceptada" })
       .andWhere("practica.evaluacionId IS NULL")
       .getCount();
     const count_snaccion = await this.practicaRepository.createQueryBuilder("practica").
       where("practica.alumnoId = :id", { id: alumno.id })
-      .andWhere("practica.ocasion = :ocasion", { ocasion: "Primera" })
+      .andWhere("practica.ocasion = :ocasion", { ocasion: ocacion })
       .andWhere("practica.estado = :estado", { estado: "Sin Acción" })
       .andWhere("practica.evaluacionId IS NULL")
       .getCount();
     const count_evaluadas = await this.evaluacionesRepository.createQueryBuilder("evaluaciones")
       .innerJoin("evaluaciones.practicas", "practica")
       .where("practica.alumnoId = :id", { id: alumno.id })
-      .andWhere("practica.ocasion = :ocasion", { ocasion: "Primera" })
+      .andWhere("practica.ocasion = :ocasion", { ocasion: ocacion })
       .andWhere("practica.estado = :estado", { estado: "Aceptada" })
       .andWhere("evaluaciones.evaluacion = :evaluacion", { evaluacion: "Aprobada" })
       .getCount();
+    const count_aprobadas = await this.practicaRepository.createQueryBuilder("practica")
+      .where("practica.alumnoId = :id", { id: alumno.id })
+      .andWhere("practica.ocasion = :ocasion", { ocasion: ocacion })
+      .andWhere("practica.estado = :estado", { estado: "Aceptada" })
+      .getCount();
+
+    const count_rechazadas = await this.practicaRepository.createQueryBuilder("practica")
+      .where("practica.alumnoId = :id", { id: alumno.id })
+      .andWhere("practica.ocasion = :ocasion", { ocasion: ocacion })
+      .andWhere("practica.estado = :estado", { estado: "Rechazada" })
+      .getCount();
+
+    const practicas = await this.practicaRepository.createQueryBuilder("practica")
+      .select(["practica.fechaCambioEstado",
+        "practica.estado",
+        "practica.ocasion",
+        "practica.descripcion"
+      ])
+      .where("practica.alumnoId = :id", { id: alumno.id })
+      .andWhere("practica.ocasion = :ocasion", { ocasion: ocacion })
+      .getMany()
     if (count_snevaluar > 0 || count_evaluadas > 0 || count_snaccion > 0) {
       return {
         status: false,
         contadores: {
           sin_evaluar: count_snevaluar,
           evaluadas: count_evaluadas,
-          sin_accion: count_snaccion
-        }
-      }    }
+          sin_accion: count_snaccion,
+          aprobadas: count_aprobadas,
+          rechazadas: count_rechazadas
+        },
+        practicas
+      }
+    }
     return {
       status: true,
       contadores: {
         sin_evaluar: count_snevaluar,
         evaluadas: count_evaluadas,
-        sin_accion: count_snaccion
-      }
+        sin_accion: count_snaccion,
+        aprobadas: count_aprobadas,
+        rechazadas: count_rechazadas,
+      },
+      practicas
     };
   }
 
@@ -107,7 +135,7 @@ export class PracticaService {
       console.log(err)
       return "Error en la inserción de los datos a la bd en organismo";
     }
-    practicaData = { ...practicaData, organismoId: organismoId, supervisorId: supervisorId, alumnoId: alumno.id, horasPractica: horarioData.totalHoras, fechaInicio: practicaData.fechaInicio, fechaTermino: practicaData.fechaTermino};
+    practicaData = { ...practicaData, organismoId: organismoId, supervisorId: supervisorId, alumnoId: alumno.id, horasPractica: horarioData.totalHoras, fechaInicio: practicaData.fechaInicio, fechaTermino: practicaData.fechaTermino };
     try {
       const practica = await this.practicaRepository.save(practicaData);
       practicaId = practica.id;
@@ -223,14 +251,14 @@ export class PracticaService {
     });
     try {
       const practica = await this.practicaRepository.update(practicaId, { nombreArchivo: nombre_archivo });
-      const semestre = await this.alumnoRepository.update(alumno.id, { ultimoSemAprobado: ultimoSemestre});
+      const semestre = await this.alumnoRepository.update(alumno.id, { ultimoSemAprobado: ultimoSemestre });
     } catch (err) {
       console.log(err)
       return "Error en la inserción de los datos a la bd respecto a semestre";
     }
     const correos = await this.usuarioService.findAllSede(alumno.sede);
     const correosStr = correos.map(usuario => usuario.correo).join(', ');
-    const filepath = path.join(__dirname, "..", "..", "public", "documentos", alumno.run.toString() , nombre_archivo);
+    const filepath = path.join(__dirname, "..", "..", "public", "documentos", alumno.run.toString(), nombre_archivo);
     await this.mailerService.sendMail(
       alumno.correoInstitucional,
       'Generación práctica',

@@ -38,11 +38,11 @@ export class PracticaController {
 
   //Acciones de estudiante
   //Verifica si ya realizó una postulación prontamente hacer con front
-  @Get()
+  @Get(':ocacion')
   @UseGuards(AuthGuard('jwt'))
   @Roles('alumno')
-  verifyByMail(@Request() req: any) {
-    return this.practicaService.verifyByMail(req.user.mail);
+  verifyByMail(@Param('ocacion') ocacion: string, @Request() req: any) {
+    return this.practicaService.verifyByMail(req.user.mail, ocacion);
   }
 
   @Post()
