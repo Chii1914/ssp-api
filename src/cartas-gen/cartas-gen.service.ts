@@ -30,6 +30,10 @@ export class CartasGenService {
 
   private readonly directoryPath = path.join(__dirname, '..', '..', 'public', 'documentos');
 
+  async alo(){
+    return false;
+  }
+
   async createById(mail: string, semestre: Object) {
     console.log(semestre)
     const updateSemester = await this.alumnoRepository.update({ correoInstitucional: mail }, { ultimoSemAprobado: semestre["semestre"]});

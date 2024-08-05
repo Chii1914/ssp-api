@@ -84,9 +84,20 @@ export class PracticaService {
       .where("practica.alumnoId = :id", { id: alumno.id })
       .andWhere("practica.ocasion = :ocasion", { ocasion: ocacion })
       .getMany()
+
+    const total_primera = await this.practicaRepository.createQueryBuilder("practica")
+      .where("practica.alumnoId = :id", { id: alumno.id })
+      .andWhere("practica.ocasion = :ocasion", { ocasion: "primera" })
+      .getCount()
+    const total_segunda = await this.practicaRepository.createQueryBuilder("practica")
+      .where("practica.alumnoId = :id", { id: alumno.id })
+      .andWhere("practica.ocasion = :ocasion", { ocasion: "segunda" })
+      .getCount()
     if (count_snevaluar > 0 || count_evaluadas > 0 || count_snaccion > 0) {
       return {
         status: false,
+        total_primera: total_primera,
+        total_segunda: total_segunda,
         contadores: {
           sin_evaluar: count_snevaluar,
           evaluadas: count_evaluadas,
@@ -99,6 +110,8 @@ export class PracticaService {
     }
     return {
       status: true,
+      total_primera: total_primera,
+      total_segunda: total_segunda,
       contadores: {
         sin_evaluar: count_snevaluar,
         evaluadas: count_evaluadas,
@@ -249,6 +262,7 @@ export class PracticaService {
       piepagina: practicaData['piepagina'],
       nombre_archivo: alumno.run + '-postulacion(Primera).docx',
     });
+    console.log(practicaData['piepagina'])
     try {
       const practica = await this.practicaRepository.update(practicaId, { nombreArchivo: nombre_archivo });
       const semestre = await this.alumnoRepository.update(alumno.id, { ultimoSemAprobado: ultimoSemestre });
