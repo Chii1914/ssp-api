@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { RegionService } from './region.service';
 import { CreateRegionDto } from './dto/create-region.dto';
 import { UpdateRegionDto } from './dto/update-region.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { Roles } from 'src/common/roles/roles.decorator';
 
 @Controller('region')
 export class RegionController {
@@ -13,6 +15,8 @@ export class RegionController {
   }
 
   @Get()
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('alumno')
   findAll() {
     return this.regionService.findAll();
   }

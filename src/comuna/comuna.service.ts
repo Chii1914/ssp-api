@@ -1,15 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { CreateComunaDto } from './dto/create-comuna.dto';
 import { UpdateComunaDto } from './dto/update-comuna.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Comuna } from './entities/comuna.entity';
+
+
 
 @Injectable()
 export class ComunaService {
+  constructor(
+    @InjectRepository(Comuna)
+    private comunaRepository: Repository<Comuna>,
+  ) {}
+
   create(createComunaDto: CreateComunaDto) {
     return 'This action adds a new comuna';
   }
 
   findAll() {
-    return `This action returns all comuna`;
+    return this.comunaRepository.find();
   }
 
   findOne(id: number) {

@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ComunaService } from './comuna.service';
 import { CreateComunaDto } from './dto/create-comuna.dto';
 import { UpdateComunaDto } from './dto/update-comuna.dto';
+import { Roles } from 'src/common/roles/roles.decorator';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('comuna')
 export class ComunaController {
@@ -13,6 +15,8 @@ export class ComunaController {
   }
 
   @Get()
+  @UseGuards(AuthGuard('jwt'))
+  @Roles('alumno')
   findAll() {
     return this.comunaService.findAll();
   }
